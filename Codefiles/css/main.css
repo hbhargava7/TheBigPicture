@@ -89,7 +89,7 @@ a:hover, a:focus {
 }
 #nav-list a {
 	color: #b8b7ad;
-    font-family: 'Avenir-Medium';
+                font-family: 'Source Sans Pro', sans-serif;
 }
 
 #nav-list a:hover,
@@ -114,7 +114,7 @@ a:hover, a:focus {
 }
 #footer p {
 	color: #6A6968;
-    font-family: 'Avenir-Medium';
+                font-family: 'Source Sans Pro', sans-serif;
     font-size: 14px;
     text-align: center;
 }
@@ -207,7 +207,7 @@ video #mainVideo {
     width: auto;
     left: 50%;
     right: 50%;
-    font-family: 'Avenir-Medium';
+                font-family: 'Source Sans Pro', sans-serif;
 }
 
 /*Presenting Slideout*/

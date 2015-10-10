@@ -115,36 +115,38 @@ TimestampCluster.prototype.GetEndTimestamp = function() {
 
 var Conversation = function(ReceivedMessageList) {
     this.ReceivedMessageList = ReceivedMessageList;
-    this.OrderedMessages = [];
-    this.OrderedDecoratedMessages = [];
+    this.OrderedMessageList = [];
+    this.OrderedDecoratedMessageList = [];
     this.TimestampClusterList = [];
     this.PeakMessagingTimestampClusterList = [];
     this.UserList = [];
     this.MostTalkativeUserList = [];
+    this.MostTalkativeUserListPerClusterList = [];
 };
 
 Conversation.prototype.GetReceivedMessageList = function() {
     return this.ReceivedMessageList;
 };
 
-Conversation.prototype.PreprocessMessages = function() {
-    this.OrderedMessages = this.ReceivedMessageList;
-    this.OrderedMessages.sort(function(a, b) {
+Conversation.prototype.PreprocessMessageList = function() {
+    this.OrderedMessageList = this.ReceivedMessageList;
+    this.OrderedMessageList.sort(function(a, b) {
       return a.GetTimestamp() > b.GetTimestamp();
     });
     var temp = [];
-    for(var i = 0; i < this.OrderedMessages.length; i++) {
-        if(temp.indexOf(this.OrderedMessages[i].GetUserName()) == -1) {
-            temp.push(this.OrderedMessages[i].GetUserName());
-            this.UserList.push(new User(this.OrderedMessages[i].GetUserName(), [this.OrderedMessages[i].GetMessage()]));
+    for(var i = 0; i < this.OrderedMessageList.length; i++) {
+        if(temp.indexOf(this.OrderedMessageList[i].GetUserName()) == -1) {
+            temp.push(this.OrderedMessageList[i].GetUserName());
+            this.UserList.push(new User(this.OrderedMessageList[i].GetUserName()));
+            this.UserList[this.UserList.length - 1].AddMessage(this.OrderedMessageList[i]);
         }
         else {
-            var k = temp.indexOf(this.OrderedMessages[i].GetUserName());
-            this.UserList[k].AddMessage(this.OrderedMessages[i].GetMessage());
+            var k = temp.indexOf(this.OrderedMessageList[i].GetUserName());
+            this.UserList[k].AddMessage(this.OrderedMessageList[i]);
         }
-        this.OrderedDecoratedMessages.push(new DecoratedMessage(this.OrderedMessages[i]));
+        this.OrderedDecoratedMessageList.push(new DecoratedMessage(this.OrderedMessageList[i]));
     }
-    return this.OrderedDecoratedMessages;
+    return this.OrderedDecoratedMessageList;
 };
 
 Conversation.prototype.FindTimestampClusters = function(margin) {
@@ -152,19 +154,19 @@ Conversation.prototype.FindTimestampClusters = function(margin) {
         margin = 15 * 60 * 1000;  // 15 minutes in milliseconds   
     }
     var prev_index = 0;
-    var current_time = this.OrderedMessages[0].GetTimestamp();
-    var prev_time = this.OrderedMessages[0].GetTimestamp();
-    for(var i = 1; i < this.OrderedMessages.length; i++) {
-        if(Math.abs(this.OrderedMessages[i].GetTimestamp() - current_time) <= margin) {
+    var current_time = this.OrderedMessageList[0].GetTimestamp();
+    var prev_time = this.OrderedMessageList[0].GetTimestamp();
+    for(var i = 1; i < this.OrderedMessageList.length; i++) {
+        if(Math.abs(this.OrderedMessageList[i].GetTimestamp() - current_time) <= margin) {
         }
         else {
-            this.TimestampClusterList.push(new TimestampCluster(prev_index, i, prev_time, this.OrderedMessages[i].GetTimestamp()));
+            this.TimestampClusterList.push(new TimestampCluster(prev_index, i, prev_time, this.OrderedMessageList[i].GetTimestamp()));
             prev_index = i;
-            prev_time = this.OrderedMessages[i].GetTimestamp();
+            prev_time = this.OrderedMessageList[i].GetTimestamp();
         }
-        current_time = this.OrderedMessages[i].GetTimestamp();
+        current_time = this.OrderedMessageList[i].GetTimestamp();
     }
-    this.TimestampClusterList.push(new TimestampCluster(prev_index, this.OrderedMessages.length, prev_time, this.OrderedMessages[this.OrderedMessages.length - 1].GetTimestamp()));
+    this.TimestampClusterList.push(new TimestampCluster(prev_index, this.OrderedMessageList.length, prev_time, this.OrderedMessageList[this.OrderedMessageList.length - 1].GetTimestamp()));
     return this.TimestampClusterList;
 };
 
@@ -191,7 +193,7 @@ Conversation.prototype.GetPeakMessagingTimestampList = function() {
     this.PeakMessagingTimestampClusterList = this.GetPeakMessagingTimestampClusterList();
     for(var i = 0; i < this.PeakMessagingTimestampClusterList.length; i++) {
         var total_messages = this.PeakMessagingTimestampClusterList[i].GetEndIndex() - this.PeakMessagingTimestampClusterList[i].GetStartIndex();
-        var message_array = this.OrderedMessages.slice(this.PeakMessagingTimestampClusterList[i].GetStartIndex(), this.PeakMessagingTimestampClusterList[i].GetEndIndex());
+        var message_array = this.OrderedMessageList.slice(this.PeakMessagingTimestampClusterList[i].GetStartIndex(), this.PeakMessagingTimestampClusterList[i].GetEndIndex());
         var sum = 0;
         for(var j = 0; j < message_array.length; j++) {
             sum += message_array[j].GetTimestamp();
@@ -209,20 +211,54 @@ Conversation.prototype.FindMostTalkativeUserList = function() {
                 this.MostTalkativeUserList.push(this.UserList[i]);
             }
             else {
-                max = this.UserList[i].GetMessageSentList().length;
                 this.MostTalkativeUserList = [this.UserList[i]];
             }
+            max = this.UserList[i].GetMessageSentList().length;
         }
     }
     return this.MostTalkativeUserList;
 };
 
-Conversation.prototype.GetOrderedMessages = function() {
-    return this.OrderedMessages;
+Conversation.prototype.FindMostTalkativeUserListPerClusterList = function() {
+    for(var i = 0; i < this.TimestampClusterList.length; i++) {
+        var current = this.OrderedMessageList.slice(this.TimestampClusterList[i].GetStartIndex(), this.TimestampClusterList[i].GetEndIndex());
+        var temp = [];
+        var userList = [];
+        for(var j = 0; j < current.length; j++) {
+            if(temp.indexOf(current[j].GetUserName()) == -1) {
+                temp.push(current[j].GetUserName());
+                userList.push(new User(current[j].GetUserName()));
+                userList[userList.length - 1].AddMessage(current[j]);
+            }
+            else {
+                var k = temp.indexOf(current[j].GetUserName());
+                userList[k].AddMessage(current[j]);
+            }
+        }
+        var max = 0;
+        var current_max = [];
+        for(var m = 0; m < userList.length; m++) {
+            if(userList[m].GetMessageSentList().length >= max) {
+                if(userList[m].GetMessageSentList().length == max) {
+                    current_max.push(userList[m]);
+                }
+                else {
+                    current_max = [userList[m]];
+                }
+                max = userList[m].GetMessageSentList().length;
+            }
+        }
+        this.MostTalkativeUserListPerClusterList.push(current_max);
+    }
+    return this.MostTalkativeUserListPerClusterList;
 };
 
-Conversation.prototype.GetOrderedDecoratedMessages = function() {
-    return this.OrderedDecoratedMessages;
+Conversation.prototype.GetOrderedMessageList = function() {
+    return this.OrderedMessageList;
+};
+
+Conversation.prototype.GetOrderedDecoratedMessageList = function() {
+    return this.OrderedDecoratedMessageList;
 };
 
 Conversation.prototype.GetTimestampClusterList = function() {
@@ -236,15 +272,19 @@ Conversation.prototype.GetUserList = function() {
 var parser = new SkypeMessageParser(raw_text);
 parser.ParseMessageText();
 var pc = new Conversation(parser.GetReceivedMessageList());
-pc.PreprocessMessages();
+pc.PreprocessMessageList();
 pc.FindTimestampClusters();
 t = pc.GetPeakMessagingTimestampList();
 u = pc.FindMostTalkativeUserList();
+uu = pc.FindMostTalkativeUserListPerClusterList();
 for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
     var start = pc.GetTimestampClusterList()[i].GetStartIndex();
     var end = pc.GetTimestampClusterList()[i].GetEndIndex();
+    for(var j = 0; j < uu[i].length; j++) {
+        console.log(uu[i][j].GetUserName());
+    }
     for(var j = start; j < end; j++) {
-        console.log(pc.GetOrderedDecoratedMessages()[j].ToString());
+        console.log(pc.GetOrderedDecoratedMessageList()[j].ToString());
     }
     console.log('===============');
 }

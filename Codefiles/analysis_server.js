@@ -19,8 +19,11 @@ app.get('/', function(req, res){
 
 app.post('/', function(req, res) {
     var user_id = req.body.id;
-    var token = req.body.token;
+    var email = req.body.email;
+    var token = "placeholder"
+    var format = req.body.contentFormat;
     var content = req.body.content;
+    
     
     /*
         I have configured the JSON Format as follows:

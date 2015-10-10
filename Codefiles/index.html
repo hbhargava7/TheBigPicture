@@ -25,7 +25,36 @@
             text-align: center;
             font-size: 40pt
         }
-        input{
+        select {
+            -webkit-appearance: none;
+            -webkit-border-radius: 0px;
+
+            font-family:'Avenir-Medium';
+            font-size:17px;
+            display:block;
+            font-weight: lighter;
+            padding:10px;
+            width:90%;
+            margin-right: 5%;
+            margin-left: 5%;
+            height:40px;
+            border:none;
+            background:#1f1f1f;
+            margin-bottom:3px;
+            color:#FFF;
+             border-radius: 0px;
+            overflow: auto;
+            outline: none;
+            padding-right: 1em;
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+            -webkit-transition:background-color 0.2s ease-out;
+            -moz-transition:background-color 0.2s ease-out;
+            -o-transition:background-color 0.2s ease-out;
+            transition:background-color 0.2s ease-out
+        }
+        input {
             font-family:'Avenir-Medium';
             font-size:17px;
             display:block;
@@ -186,7 +215,7 @@
                             <div id="leftWrapper">
                                 <h2>Here will magically appear content.</h2>
                                 <br>
-                                <p>Site design by cool people.</p>
+                                <p>This project was conceived at Berkeley CalHacks 2.0.</p>
                                 <br>
                                 <p>hello@floor5.com</p>
                                 <br>
@@ -198,7 +227,14 @@
                             <form action="/" method="post" name="contact_form">
                             <fieldset>
                                 <input name="id" type="text" placeholder="Your Name">
-                                <input name="token" type="text" placeholder="Your Email">
+                                <input name="email" type="text" placeholder="Your Email">
+                                <select name="contentFormat">
+                                  <option value="choose">Choose a format.</option>
+                                  <option value="skype">Skype</option>
+                                  <option value="facebook">Facebook</option>
+                                  <option value="google">Google Hangouts</option>
+                                  <option value="other">Other</option>
+                                </select>
                                 <textarea name="content" placeholder="Content"></textarea>
                             </fieldset>	
 

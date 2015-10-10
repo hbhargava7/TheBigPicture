@@ -8,11 +8,11 @@ const port = 8080;
 
 //Configure BodyParser
 var bodyParser = require('body-parser');
-app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(bodyParser.json({limit: '50mb'})); 
+app.use(bodyParser.urlencoded({ extended: true,limit: '50mb' }));
 
 app.use(express.static(__dirname + '/'));
-
 app.get('/', function(req, res){
     res.sendFile(path.join(__dirname + '/index.html'));
 });
@@ -38,6 +38,7 @@ app.post('/', function(req, res) {
     */
     
     //Server logic goes here.
+
     var SkypeMessageParser = function(text) {
         this.MessageText = text;
         this.ReceivedMessageList = [];
@@ -85,8 +86,8 @@ app.post('/', function(req, res) {
         return this.Message;
     };
 
-    ReceivedMessage.prototype.Print = function() {
-      console.log(this.UserName + ' [' + this.Timestamp + ']: ' + this.Message);
+    ReceivedMessage.prototype.ToString = function() {
+        return this.UserName + ' [' + this.Timestamp + ']: ' + this.Message;
     };
 
     var DecoratedMessage = function(ReceivedMessage) {
@@ -107,15 +108,15 @@ app.post('/', function(req, res) {
         return this.Message;
     };
 
-    DecoratedMessage.prototype.Print = function() {
-        console.log(this.UserName + ' [' + this.MessageDate.toString() + ']:\n' + this.Message);
+    DecoratedMessage.prototype.ToString = function() {
+        return this.UserName + ' [' + this.MessageDate.toString() + ']:\n' + this.Message;
     };
 
     var TimestampCluster = function(startIndex, endIndex, startTime, endTime) {
         this.StartIndex = startIndex;
         this.EndIndex = endIndex;
         this.StartTimestamp = startTime;
-        this.endTimestamp = endTime;
+        this.EndTimestamp = endTime;
     };
 
     TimestampCluster.prototype.GetStartIndex = function() {
@@ -223,6 +224,9 @@ app.post('/', function(req, res) {
         return this.TimestampClusterList;
     };
 
+    var finalArray = [];
+    var finalString = "";
+    
     var parser = new SkypeMessageParser(content);
     parser.ParseMessageText();
     var pc = new Conversation(parser.GetReceivedMessageList());
@@ -233,16 +237,25 @@ app.post('/', function(req, res) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();
         var end = pc.GetTimestampClusterList()[i].GetEndIndex();
         for(var j = start; j < end; j++) {
-            pc.GetOrderedDecoratedMessages()[j].Print();
+            finalArray.push((pc.GetOrderedDecoratedMessages()[j].ToString()));
+            finalString += "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + ('*');
         }
-        console.log('===============');
+                                                                                          
+        finalString += "\n"
+
+        finalArray.push(('==============='));
+        finalString += ('===============');
+        finalString += "\n";
     }
     for(var i = 0; i < t.length; i++) {
         console.log(new Date(t[i]).toString());
     }
+    res.writeHead(200, {
+        'Content-Type': 'text/html',
 
+    });
     //    res.send("Server received data successfully: " +user_id + ' ' + token + ' ' + content);
-    res.send("Request received from " + user_id + ". content word count: " + countWords(content));
+    res.end("<html><head><style type=\"text/css\">html{white-space: pre-wrap;}</style></head><body>"+finalString+"</body></html>");
 });
 
 //Incept server

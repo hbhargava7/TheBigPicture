@@ -203,7 +203,7 @@ video #mainVideo {
 }
 
 #text_overlay {
-    position: absolute;
+    position: absolute;-
     width: auto;
     left: 50%;
     right: 50%;

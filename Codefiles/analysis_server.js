@@ -41,6 +41,13 @@ app.post('/', function(req, res) {
 
     var natural = require('natural');
     var nlp_compromise = require('nlp_compromise');
+    var summarization = 
+
+    var Tense = {
+        PAST: 1,
+        PRESENT: 2,
+        FUTURE: 3
+    };
 
     var SkypeMessageParser = function(text) {
     this.MessageText = text;
@@ -101,9 +108,9 @@ var ReceivedMessage = function(UserName, Timestamp, Message) {
     this.Timestamp = Timestamp;
     this.Message = Message;
     this.WordList = [];
+    this.TenseList = [];
     var words = [];
     var split_words = new natural.WordTokenizer().tokenize(this.Message);
-    console.log(split_words);
     for(var i = 0; i < split_words.length; i++) {
         var ind = words.indexOf(split_words[i]);
         if(ind == -1) {
@@ -123,6 +130,23 @@ var ReceivedMessage = function(UserName, Timestamp, Message) {
         }
         return 0;
     });
+    this.SentenceList = nlp_compromise.pos(this.Message).sentences;
+    for(var i = 0; i < this.SentenceList.length; i++) {
+        var temp = [];
+        var loop = this.SentenceList[i].tense();
+        for(var j = 0; j < loop.length; j++) {
+            if(loop[i] == 'present') {
+                temp.push(Tense.PRESENT);
+            }
+            else if (loop[i] == 'past') {
+                temp.push(Tense.PAST);
+            }
+            else {
+                temp.push(Tense.FUTURE);
+            }
+        }
+        this.TenseList.push(temp);
+    }
 };
 
 ReceivedMessage.prototype.GetUserName = function() {
@@ -542,7 +566,7 @@ Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
     for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();
         var end = pc.GetTimestampClusterList()[i].GetEndIndex();
-        finalString += "Most Talkative Users: ";
+        /*finalString += "Most Talkative Users: ";
         for(var j = 0; j < uu[i].length; j++) {
             finalString += (uu[i][j].GetUserName()) + "\n";
             for(var h = 0; h < uu[i][j].GetLinkList().length; h++) {
@@ -573,7 +597,7 @@ Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
                 finalString += to_print + "\n";
             }
             finalString += "--------------\n"
-        }
+        }*/
         finalString += "Start Time: " + new Date(pc.GetTimestampClusterList()[i].GetStartTimestamp()).toString() + "\n";
         for(var j = start; j < end; j++) {
             finalArray.push((pc.GetOrderedDecoratedMessageList()[j].ToString()));

@@ -1,5 +1,7 @@
 //Configure base framework requirements
 var express = require('express');
+var path = require('path');
+
 var app = express();
 
 const port = 8080;
@@ -9,7 +11,13 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/api/', function(req, res) {
+app.use(express.static(__dirname + '/'));
+
+app.get('/', function(req, res){
+    res.sendFile(path.join(__dirname + '/index.html'));
+});
+
+app.post('/', function(req, res) {
     var user_id = req.body.id;
     var token = req.body.token;
     var content = req.body.content;

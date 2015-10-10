@@ -66,7 +66,7 @@ SkypeMessageParser.prototype.ParseMessageText = function() {
         var time = line.substring(line.indexOf(',')+2, line.indexOf(']')-3);
         var PM = ((line.substring(line.indexOf(',')+2, line.indexOf(']'))).indexOf("AM") === - 1);
         time = time.split(":");
-        if (PM){
+        if (PM && parseInt(time[0]) !== 12){
             time[0] = String(parseInt(time[0]) + 12);
         }
         date.setHours(time[0],time[1],time[2]);
@@ -102,17 +102,27 @@ var ReceivedMessage = function(UserName, Timestamp, Message) {
     this.Message = Message;
     this.WordList = [];
     var words = [];
-    console.log(natural);
     var split_words = new natural.WordTokenizer().tokenize(this.Message);
+    console.log(split_words);
     for(var i = 0; i < split_words.length; i++) {
         var ind = words.indexOf(split_words[i]);
         if(ind == -1) {
             this.WordList.push(new Word(split_words[i], 1));
+            words.push(split_words[i]);
         }
         else {
             this.WordList[ind].IncrementFrequency(1);
         }
     }
+    this.WordList.sort(function(a, b) {
+        if(a.GetFrequency() < b.GetFrequency()) {
+            return -1;
+        }
+        if(a.GetFrequency() > b.GetFrequency()) {
+            return 1;
+        }
+        return 0;
+    });
 };
 
 ReceivedMessage.prototype.GetUserName = function() {
@@ -136,6 +146,7 @@ ReceivedMessage.prototype.ToString = function() {
 };
 
 var DecoratedMessage = function(ReceivedMessage) {
+    this.RawReceivedMessage = ReceivedMessage;
     this.UserName = ReceivedMessage.GetUserName();
     this.MessageDate = new Date(ReceivedMessage.GetTimestamp());
     this.Message = ReceivedMessage.GetMessage();
@@ -156,6 +167,10 @@ DecoratedMessage.prototype.GetMessage = function() {
 
 DecoratedMessage.prototype.GetWordList = function() {
     return this.WordList;
+}
+
+DecoratedMessage.prototype.GetRawReceivedMessage = function() {
+    return this.RawReceivedMessage;
 }
 
 DecoratedMessage.prototype.ToString = function() {
@@ -192,6 +207,7 @@ var User = function(user) {
     this.MessageSentList = [];
     this.LinkList = [];
     this.WordList = [];
+    this.WordDistributionList = [];
 };
 
 User.prototype.GetUserName = function() {
@@ -213,6 +229,34 @@ User.prototype.GetLinkList = function() {
 User.prototype.AddLink = function(link) {
     this.LinkList.push(link);
 };
+
+User.prototype.GenerateWordDistributionList = function() {
+    var temp = [];
+    var cont = [];
+    for(var i = 0; i < this.MessageSentList.length; i++) {
+        for(var j = 0; j < this.MessageSentList[i].GetWordList().length; j++) {
+            var ind = temp.indexOf(this.MessageSentList[i].GetWordList()[j].GetText());
+            if(ind == -1) {
+                cont.push(new Word(this.MessageSentList[i].GetWordList()[j].GetText(), 1));
+                temp.push(this.MessageSentList[i].GetWordList()[j].GetText());
+            }
+            else {
+                cont[ind].IncrementFrequency();
+            }
+        }
+    }
+    cont.sort(function(a, b) {
+        if(a.GetFrequency() < b.GetFrequency()) {
+            return -1;
+        }
+        if(a.GetFrequency() > b.GetFrequency()) {
+            return 1;
+        }
+        return 0;
+    });
+    this.WordDistributionList = cont;
+    return this.WordDistributionList;
+}
 
 var TimestampCluster = function(startIndex, endIndex, startTime, endTime) {
     this.StartIndex = startIndex;
@@ -360,7 +404,7 @@ Conversation.prototype.FindMostTalkativeUserList = function() {
 };
 
 Conversation.prototype.FindLeastTalkativeUserList = function() {
-    var min = 0;
+    var min = 10000000;
     for(var i = 0; i < this.UserList.length; i++) {
         if(this.UserList[i].GetMessageSentList().length <= min) {
             if(this.UserList[i].GetMessageSentList().length == min) {
@@ -441,20 +485,20 @@ Conversation.prototype.FindLeastTalkativeUserListPerClusterList = function() {
                 }
             }
         }
-        var min = 0;
+        var min = 10000000;
         var current_min = [];
         for(var m = 0; m < userList.length; m++) {
             if(userList[m].GetMessageSentList().length <= min) {
                 if(userList[m].GetMessageSentList().length == min) {
-                    current_max.push(userList[m]);
+                    current_min.push(userList[m]);
                 }
                 else {
-                    current_max = [userList[m]];
+                    current_min = [userList[m]];
                 }
                 max = userList[m].GetMessageSentList().length;
             }
         }
-        this.LeastTalkativeUserListPerClusterList.push(current_max);
+        this.LeastTalkativeUserListPerClusterList.push(current_min);
     }
     return this.LeastTalkativeUserListPerClusterList;
 };
@@ -478,7 +522,7 @@ Conversation.prototype.GetUserList = function() {
 Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
     var temp = [];
     for(var i = 0; i < this.GetTimestampClusterList().length; i++) {
-        temp.push({'x': i, 'y': this.GetTimestampClusterList()[i].GetEndIndex() - this.GetTimestampClusterList()[i].GetStartIndex()});
+        temp.push({'y': this.GetTimestampClusterList()[i].GetEndIndex() - this.GetTimestampClusterList()[i].GetStartIndex()});
     }
     return temp;
 };
@@ -493,6 +537,7 @@ Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
     pc.FindTimestampClusters();
     t = pc.GetPeakMessagingTimestampList();
     uu = pc.FindMostTalkativeUserListPerClusterList();
+    uul = pc.FindLeastTalkativeUserListPerClusterList();
     hist = pc.TimeClusterChatFrequencyToHistogram();
     for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();
@@ -503,12 +548,36 @@ Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
             for(var h = 0; h < uu[i][j].GetLinkList().length; h++) {
                 finalString += uu[i][j].GetLinkList()[h] + "\n";
             }
+            var word_dist = uu[i][j].GenerateWordDistributionList();
+            for(var c = 0; c < word_dist.length; c++) {
+                var to_print = word_dist[c].GetText() + ": ";
+                for(var d = 0; d < word_dist[c].GetFrequency(); d++) {
+                    to_print += "*";
+                }
+                finalString += to_print + "\n";
+            }
+            finalString += "--------------\n"
+        }
+        finalString += "Least Talkative Users: ";
+        for(var j = 0; j < uul[i].length; j++) {
+            finalString += (uul[i][j].GetUserName()) + "\n";
+            for(var h = 0; h < uul[i][j].GetLinkList().length; h++) {
+                finalString += uul[i][j].GetLinkList()[h] + "\n";
+            }
+            var word_dist = uu[i][j].GenerateWordDistributionList();
+            for(var c = 0; c < word_dist.length; c++) {
+                var to_print = word_dist[c].GetText() + ": ";
+                for(var d = 0; d < word_dist[c].GetFrequency(); d++) {
+                    to_print += "*";
+                }
+                finalString += to_print + "\n";
+            }
             finalString += "--------------\n"
         }
         finalString += "Start Time: " + new Date(pc.GetTimestampClusterList()[i].GetStartTimestamp()).toString() + "\n";
         for(var j = start; j < end; j++) {
             finalArray.push((pc.GetOrderedDecoratedMessageList()[j].ToString()));
-            finalString += "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + ('*');
+            finalString += ('*');
         }
         finalString += "\n"
 

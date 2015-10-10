@@ -25,10 +25,15 @@ app.post('/api/', function(req, res) {
         
         Test format is 'x-www-form-urlencoded'
     */
+    
+    //Server logic goes here.
 
+    function countWords(str) {
+      return str.split(/\s+/).length;
+    }
     
-    
-    res.send("Server received data successfully: " +user_id + ' ' + token + ' ' + content);
+//    res.send("Server received data successfully: " +user_id + ' ' + token + ' ' + content);
+    res.send("Request received from " + user_id + ". content word count: " + countWords(content));
 });
 
 //Incept server

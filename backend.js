@@ -73,6 +73,23 @@ DecoratedMessage.prototype.ToString = function() {
     return this.UserName + ' [' + this.MessageDate.toString() + ']:\n' + this.Message;
 };
 
+var User = function(user) {
+    this.UserName = user;
+    this.MessageSentList = [];
+};
+
+User.prototype.GetUserName = function() {
+    return this.UserName;
+};
+
+User.prototype.GetMessageSentList = function() {
+    return this.MessageSentList;
+};
+
+User.prototype.AddMessage = function(message) {
+    this.MessageSentList.push(message);
+};
+
 var TimestampCluster = function(startIndex, endIndex, startTime, endTime) {
     this.StartIndex = startIndex;
     this.EndIndex = endIndex;
@@ -102,6 +119,8 @@ var Conversation = function(ReceivedMessageList) {
     this.OrderedDecoratedMessages = [];
     this.TimestampClusterList = [];
     this.PeakMessagingTimestampClusterList = [];
+    this.UserList = [];
+    this.MostTalkativeUserList = [];
 };
 
 Conversation.prototype.GetReceivedMessageList = function() {
@@ -113,7 +132,16 @@ Conversation.prototype.PreprocessMessages = function() {
     this.OrderedMessages.sort(function(a, b) {
       return a.GetTimestamp() > b.GetTimestamp();
     });
+    var temp = [];
     for(var i = 0; i < this.OrderedMessages.length; i++) {
+        if(temp.indexOf(this.OrderedMessages[i].GetUserName()) == -1) {
+            temp.push(this.OrderedMessages[i].GetUserName());
+            this.UserList.push(new User(this.OrderedMessages[i].GetUserName(), [this.OrderedMessages[i].GetMessage()]));
+        }
+        else {
+            var k = temp.indexOf(this.OrderedMessages[i].GetUserName());
+            this.UserList[k].AddMessage(this.OrderedMessages[i].GetMessage());
+        }
         this.OrderedDecoratedMessages.push(new DecoratedMessage(this.OrderedMessages[i]));
     }
     return this.OrderedDecoratedMessages;
@@ -173,6 +201,22 @@ Conversation.prototype.GetPeakMessagingTimestampList = function() {
     return ret;
 };
 
+Conversation.prototype.FindMostTalkativeUserList = function() {
+    var max = 0;
+    for(var i = 0; i < this.UserList.length; i++) {
+        if(this.UserList[i].GetMessageSentList().length >= max) {
+            if(this.UserList[i].GetMessageSentList().length == max) {
+                this.MostTalkativeUserList.push(this.UserList[i]);
+            }
+            else {
+                max = this.UserList[i].GetMessageSentList().length;
+                this.MostTalkativeUserList = [this.UserList[i]];
+            }
+        }
+    }
+    return this.MostTalkativeUserList;
+};
+
 Conversation.prototype.GetOrderedMessages = function() {
     return this.OrderedMessages;
 };
@@ -185,12 +229,17 @@ Conversation.prototype.GetTimestampClusterList = function() {
     return this.TimestampClusterList;
 };
 
+Conversation.prototype.GetUserList = function() {
+    return this.UserList;
+};
+
 var parser = new SkypeMessageParser(raw_text);
 parser.ParseMessageText();
 var pc = new Conversation(parser.GetReceivedMessageList());
 pc.PreprocessMessages();
 pc.FindTimestampClusters();
 t = pc.GetPeakMessagingTimestampList();
+u = pc.FindMostTalkativeUserList();
 for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
     var start = pc.GetTimestampClusterList()[i].GetStartIndex();
     var end = pc.GetTimestampClusterList()[i].GetEndIndex();
@@ -201,4 +250,7 @@ for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
 }
 for(var i = 0; i < t.length; i++) {
     console.log(new Date(t[i]).toString());
+}
+for(var i = 0; i < u.length; i++) {
+    console.log(u[i].GetUserName());
 }

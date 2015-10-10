@@ -589,7 +589,7 @@ Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
         'Content-Type': 'text/html',
 
     });
-    //    res.send("Server received data successfully: " +user_id + ' ' + token + ' ' + content);
+
     res.end("<html><head><style type=\"text/css\">html{white-space: pre-wrap;}</style></head><body>"+finalString+"</body></html>");
 });
 

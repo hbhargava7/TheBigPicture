@@ -41,7 +41,7 @@ app.post('/', function(req, res) {
 
     var natural = require('natural');
     var nlp_compromise = require('nlp_compromise');
-    var summarization = 
+    var sum = require('sum');
 
     var Tense = {
         PAST: 1,
@@ -316,6 +316,8 @@ var Conversation = function(ReceivedMessageList) {
     this.LeastTalkativeUserList = [];
     this.MostTalkativeUserListPerClusterList = [];
     this.LeastTalkativeUserListPerClusterList = [];
+    this.TimestampClusterSummaryList = [];
+    this.Summary = [];
 };
 
 Conversation.prototype.GetReceivedMessageList = function() {
@@ -543,12 +545,28 @@ Conversation.prototype.GetUserList = function() {
     return this.UserList;
 };
 
+Conversation.prototype.GetTimestampClusterSummaryList = function() {
+    for(var i = 0; i < this.TimestampClusterList.length; i++) {
+        var raw_text = "";
+        for(var j = this.TimestampClusterList[i].GetStartIndex(); j < this.TimestampClusterList[i].GetEndIndex(); j++) {
+            raw_text += this.OrderedMessageList[i].GetMessage().trim();
+            if(this.OrderedMessageList[i].GetMessage().trim()[this.OrderedMessageList[i].GetMessage().trim().length - 1] !== '.') {
+                raw_text += '.'
+            }
+            raw_text += ' ';
+        }
+    }
+
+}
+
 Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
     var temp = [];
+    var temp2 = [];
     for(var i = 0; i < this.GetTimestampClusterList().length; i++) {
-        temp.push({'y': this.GetTimestampClusterList()[i].GetEndIndex() - this.GetTimestampClusterList()[i].GetStartIndex()});
+        temp.push(i);
+        temp2.push(this.GetTimestampClusterList()[i].GetEndIndex() - this.GetTimestampClusterList()[i].GetStartIndex());
     }
-    return temp;
+    return {"buckets": temp, "values": temp2};
 };
     
     var finalArray = [];

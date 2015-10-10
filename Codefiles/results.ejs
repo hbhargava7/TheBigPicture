@@ -10,9 +10,6 @@
         
         <link href="css/normalize.css" rel="stylesheet" type="text/css">
         <link href="css/main.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" type="text/css" href="css/epoch.min.css">
-
-        <script src="js/epoch.min.js"></script>
 
         <style type="text/css">
         #main-wrapper {
@@ -192,30 +189,49 @@
         ul li {
             display: inline;   
         }
+            .bar {
+          fill: steelblue;
+        }
+
+        .bar:hover {
+          fill: brown;
+        }
+
+        .axis {
+          font: 10px sans-serif;
+        }
+
         .axis path,
-        .axis line,
-            
-            {
+        .axis line {
+          fill: none;
+          stroke: #fff;
+          shape-rendering: crispEdges;
+        }
+
+        .x.axis path {
+          display: none;
+        }
+
+        .axis path,
+        .axis line, {
             fill: none;
                 stroke: white;
             shape-rendering: crispEdges;
         }
-/*
+
         .tick path{
             fill: white;
             stroke: white;
             shape-rendering: crispEdges;
         }
-*/
-        .bar {
-            fill: white;   
-        }
+
+
         .bar rect {
           fill: steelblue;
           shape-rendering: crispEdges;
         }
 
-        .bar text {
+         text {
           fill: #fff;
         }
 
@@ -224,15 +240,17 @@
           stroke: #fff;
           shape-rendering: crispEdges;
         }
+
+
         </style>
         
         
     </head>
-    <body class="epoch-theme-dark">
+    <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 
     
-    <div id="page_effect" style="display:none;">
+    <div id="page_effect" style="">
         <div id="container">
             <div id="main-wrapper">
                 <div id="main">
@@ -262,73 +280,77 @@
             </div>
         </div>
         </div>
-            <script>
+        <script>
 
                 
-        var graphData = <%- JSON.stringify(graphData) %>;
-        
-        // Generate a Bates distribution of 10 random variables.
-        var values = d3.range(1000).map(d3.random.bates(10));
+            var graphData = <%- JSON.stringify(graphData) %>;
+            
+            var data = {
+                "buckets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                "values": [0, 0, 34, 421, 738, 0, 218, 22, 22, 109, 0, 456]
+            }
 
-        // A formatter for counts.
-        var formatCount = d3.format(",.0f");
+        draw(data);
 
-        var margin = {top: 10, right: 30, bottom: 30, left: 30},
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
+        function draw(data) {
+            var margin = {
+                    "top": 10,
+                    "right": 10,
+                    "bottom": 30,
+                    "left": 50
+                },
+                width = 600,
+                height = 400;
 
-        var x = d3.scale.linear()
-            .domain([0, 1])
-            .range([0, width]);
+            var x = d3.scale.ordinal()
+                .domain(data.buckets.map(function(d) {
+                    return d;}))
+                .rangeRoundBands([0, width], 0);
 
-        // Generate a histogram using twenty uniformly-spaced bins.
-        var data = d3.layout.histogram()
-            .bins(x.ticks(20))
-            (values);
 
-        var y = d3.scale.linear()
-            .domain([0, d3.max(data, function(d) { return d.y; })])
-            .range([height, 0]);
+            var y = d3.scale.linear()
+                .domain([0, d3.max(data.values)])
+                .range([height, 0]);
 
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
+            var xAxis = d3.svg.axis().scale(x).orient("bottom");
 
-        var svg = d3.select($("#analysis")[0]).append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            var yAxis = d3.svg.axis().scale(y).orient("left");
 
-        var bar = svg.selectAll(".bar")
-            .data(data)
-          .enter().append("g")
-            .attr("class", "bar")
-            .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+            var svgContainer = d3.select($("#analysis")[0]).append("svg")
+                .attr("class", "chart")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom).append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.right + ")");
 
-        bar.append("rect")
-            .attr("x", 1)
-            .attr("width", x(data[0].dx) - 1)
-            .attr("height", function(d) { return height - y(d.y); });
+            svgContainer.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate( 0," + height + ")")
+                .call(xAxis);
 
-        bar.append("text")
-            .attr("dy", ".75em")
-            .attr("y", 6)
-            .attr("x", x(data[0].dx) / 2)
-            .attr("text-anchor", "middle")
-            .text(function(d) { return formatCount(d.y); });
+            svgContainer.append("g")
+                .attr("class", "y axis").call(yAxis)
+                .append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text("Values");
 
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-    </script>
-
-        <script type="text/javascript">
-            $(document).ready(function(){	
-	       $('#page_effect').fadeIn(1000);
-            });
+            svgContainer.selectAll(".bar").data(data.values).enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d, i) {
+                    return i * x.rangeBand();
+                })
+                .attr("y", function(d) {
+                    return y(d);
+                })
+                .attr("width", function(){
+                    return x.rangeBand();
+                })
+                .attr("height", function(d) {
+                    return height -y(d);
+                });
+        }
             
         </script>
         <script type="text/javascript" src="code/js/classie.js"></script>

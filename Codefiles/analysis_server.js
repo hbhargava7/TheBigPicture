@@ -766,6 +766,7 @@ Conversation.prototype.GetCoupleList = function() {
             var person1 = this.OrderedMessageList[j].GetUserName();
             var person2 = "";
             back_and_forth_counter += 1;
+            j += 1;
             var person1_check = false;
             while(j < tc.GetEndIndex()) {
                 if(person2 === "") {
@@ -874,21 +875,32 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
             }
         }
     }
+    max = 0;
+    var index = 0;
+    for(var i = 0; i < this.BackAndForthList.length; i++) {
+        if(this.BackAndForthList[i][1] > max) {
+            if(this.BackAndForthList[i][0][0] !== this.BackAndForthList[i][0][1]) {
+                index = i;
+                max = this.BackAndForthList[i][1];
+            }
+        }
+    }
     temp12 = this.InterestingWordList;
     var temp13 = this.PerInterestingWordData;
     var temp14 = this.CumulativeHistogramTotalList;
+    var temp17 = this.BackAndForthList[index][0];
     return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
             "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.TimestampClusterList[0].GetStartTimestamp()).toLocaleString(),
             "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toLocaleString(), "total_messages": this.OrderedMessageList.length,
             "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9, "trimmed": this.Trimmed,
             "interesting_word_conversations": temp12, "per_interesting_words_per_user": temp13, "cumulative_histogram": temp14, "most_lonely_users": temp15,
-            "most_probable_couple": "", "ending_times": temp16};
+            "most_probable_couple": temp17, "ending_times": temp16};
 };
     
     var finalArray = [];
     var finalString = "";
     
-    var parser = new SkypeMessageParser(content);
+    var parser = new FacebookMessageParser(content);
     parser.ParseMessageText();
     var pc = new Conversation(parser.GetReceivedMessageList());
     pc.PreprocessMessageList();
@@ -903,8 +915,8 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     summ = pc.GenerateConversationSummary();
     ml = pc.GetMostLonelyList();
     pc.GetInterestingWordList();
+    pc.GetCoupleList();
     hist = pc.DataToFrequencyHistogram();
-    console.log()
     /*for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();
         var end = pc.GetTimestampClusterList()[i].GetEndIndex();

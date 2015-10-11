@@ -60,13 +60,6 @@ app.post('/', function(req, res) {
     this.ReceivedMessageList = [];
 };
 
-var InterestingWords = {
-    FUCK: "fuck",
-    LOVE: "love",
-    HATE: "hate",
-    SHIT: "shit"
-};
-
 SkypeMessageParser.prototype.GetMessageText = function() {
     return this.MessageText;
 };
@@ -379,7 +372,10 @@ var Conversation = function(ReceivedMessageList) {
     this.LeastTalkativeUserListPerClusterList = [];
     this.TimestampClusterSummaryList = [];
     this.Summary = "";
+    this.InterestingWordCountPerUser = [];
     this.Trimmed = false;
+    this.PerInterestingWordData = [];
+    this.CumulativeHistogramTotalList = [];
 };
 
 Conversation.prototype.GetReceivedMessageList = function() {
@@ -661,11 +657,107 @@ Conversation.prototype.GenerateConversationSummary = function() {
     return this.Summary;
 }
 
-Conversation.prototype.GetInterestingWordsPerUser = function() {
+Conversation.prototype.GetInterestingWordCountPerUser = function() {
+    temp = [];
+    pairs = [];
+    totals = [];
     for(var i = 0; i < this.OrderedMessageList.length; i++) {
-        var trimmed = this.OrderedMessageList[i].GetMessage().trim();
-        //if(trimmed.toLowerCase)
+        var trimmed = this.OrderedMessageList[i].GetMessage().trim().toLowerCase();
+        if(trimmed == "fuck" || trimmed == "wtf" || trimmed == "fsck" || trimmed == "fck" ||
+            trimmed == "love" || trimmed == "hate" || trimmed == "shit" || trimmed == "") {
+
+        }
+        else {
+            var f = trimmed.indexOf("fuck");
+            if(f == -1) {
+                var h = trimmed.indexOf("hate");
+                if(h == -1) {
+                    var l = trimmed.indexOf("love");
+                    if(l == -1) {
+                        var s = trimmed.indexOf("shit");   
+                        if(s == -1) {
+                            var k = trimmed.indexOf("kill");
+                            if(k == -1) {
+
+                            }
+                            else {
+                                if(temp.indexOf(this.OrderedMessageList[i].GetUserName()) == -1) {
+                                    pairs.push([this.OrderedMessageList[i].GetUserName(), 1, [this.OrderedMessageList[i].GetMessage()]]);
+                                    temp.push(this.OrderedMessageList[i].GetUserName());
+                                    totals.push([this.OrderedMessageList[i].GetUserName(), [0,0,0,0,1]]);
+                                }
+                                else {
+                                    pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1] += 1;
+                                    pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][2].push(this.OrderedMessageList[i].GetMessage());
+                                    totals[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1][4] += 1;
+                                }
+                            }
+                        }
+                        else {
+                            if(temp.indexOf(this.OrderedMessageList[i].GetUserName()) == -1) {
+                                pairs.push([this.OrderedMessageList[i].GetUserName(), 1, [this.OrderedMessageList[i].GetMessage()]]);
+                                temp.push(this.OrderedMessageList[i].GetUserName());
+                                totals.push([this.OrderedMessageList[i].GetUserName(), [0,0,0,1,0]]);
+                            }
+                            else {
+                                pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1] += 1;
+                                pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][2].push(this.OrderedMessageList[i].GetMessage());
+                                totals[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1][3] += 1;
+                            }
+                        }
+                    }
+                    else {
+                        if(temp.indexOf(this.OrderedMessageList[i].GetUserName()) == -1) {
+                            pairs.push([this.OrderedMessageList[i].GetUserName(), 1, [this.OrderedMessageList[i].GetMessage()]]);
+                            temp.push(this.OrderedMessageList[i].GetUserName());
+                            totals.push([this.OrderedMessageList[i].GetUserName(), [0,0,1,0,0]]);
+                        }
+                        else {
+                            pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1] += 1;
+                            pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][2].push(this.OrderedMessageList[i].GetMessage());
+                            totals[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1][2] += 1;
+                        }
+                    }
+                }
+                else {
+                    if(temp.indexOf(this.OrderedMessageList[i].GetUserName()) == -1) {
+                        pairs.push([this.OrderedMessageList[i].GetUserName(), 1, [this.OrderedMessageList[i].GetMessage()]]);
+                        temp.push(this.OrderedMessageList[i].GetUserName());
+                        totals.push([this.OrderedMessageList[i].GetUserName(), [0,1,0,0,0]]);
+                    }
+                    else {
+                        pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1] += 1;
+                        pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][2].push(this.OrderedMessageList[i].GetMessage());
+                        totals[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1][1] += 1;
+                    }
+                }
+            }
+            else {
+                if(temp.indexOf(this.OrderedMessageList[i].GetUserName()) == -1) {
+                    pairs.push([this.OrderedMessageList[i].GetUserName(), 1, [this.OrderedMessageList[i].GetMessage()]]);
+                    temp.push(this.OrderedMessageList[i].GetUserName());
+                    totals.push([this.OrderedMessageList[i].GetUserName(), [1,0,0,0,0]]);
+                }
+                else {
+                    pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1] += 1;
+                    pairs[temp.indexOf(this.OrderedMessageList[i].GetUserName())][2].push(this.OrderedMessageList[i].GetMessage());
+                    totals[temp.indexOf(this.OrderedMessageList[i].GetUserName())][1][0] += 1;
+                }
+            }
+        }
     }
+    this.PerInterestingWordData = totals;
+    this.InterestingWordCountPerUser = pairs;
+    return this.InterestingWordCountPerUser;
+}
+
+Conversation.prototype.GetCumulativeHistogramTotals = function() {
+    var tot = 0;
+    for(var i = 0; i < this.TimestampClusterList.length; i++) {
+        this.CumulativeHistogramTotalList.push(tot);
+        tot += this.TimestampClusterList[i].GetEndIndex() - this.TimestampClusterList[i].GetStartIndex();
+    }
+    return this.CumulativeHistogramTotalList;
 }
 
 Conversation.prototype.DataToFrequencyHistogram = function() {
@@ -678,7 +770,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp7 = [];
     var temp8 = [];
     var temp9 = [];
-    var temp10 = [];
+    var temp12 = [];
     var inner_most = this.MostTalkativeUserListPerClusterList; 
     var inner_least = this.LeastTalkativeUserListPerClusterList;
     for(var i = 0; i < this.GetTimestampClusterList().length; i++) {
@@ -695,7 +787,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
         temp3.push(temp_most);
         temp4.push(temp_least);
         temp5.push(this.TimestampClusterSummaryList[i]);
-        temp6.push(new Date(this.TimestampClusterList[i].GetStartTimestamp()).toString());
+        temp6.push(new Date(this.TimestampClusterList[i].GetStartTimestamp()).toLocaleString());
     }
     for(var i = 0; i < this.MostTalkativeUserList.length; i++) {
         temp7.push(this.MostTalkativeUserList[i].GetUserName());
@@ -706,11 +798,28 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     for(var i = 0; i < this.UserList.length; i++) {
         temp9.push(this.UserList[i].GetUserName());
     }
+    for(var i = 0; i < this.InterestingWordCountPerUser.length; i++) {
+        for(var j = 0; j < this.InterestingWordCountPerUser[2].length; j++) {
+            temp12.push(this.InterestingWordCountPerUser[0] + ": " + this.InterestingWordCountPerUser[2][j]);
+        }
+    }
+    var temp13 = this.PerInterestingWordData;
+    var temp14 = this.CumulativeHistogramTotalList;
+    console.log(temp12, temp13);
+    console.log(temp14);
+    console.log(temp7, temp8);
     return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
-            "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.TimestampClusterList[0].GetStartTimestamp()).toString(),
-            "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toString(), "total_messages": this.OrderedMessageList.length,
-            "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9, "trimmed": this.Trimmed};
+            "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.TimestampClusterList[0].GetStartTimestamp()).toLocaleString(),
+            "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toLocaleString(), "total_messages": this.OrderedMessageList.length,
+            "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9, "trimmed": this.Trimmed,
+            "interesting_word_conversations": temp12, "per_interesting_words_per_user": temp13, "cumulative_histogram": temp14};
 };
+
+Conversation.prototype.MostLonely = function() {
+    temp = [];
+    ret = [];
+
+}
     
     var finalArray = [];
     var finalString = "";
@@ -720,13 +829,16 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     var pc = new Conversation(parser.GetReceivedMessageList());
     pc.PreprocessMessageList();
     pc.FindTimestampClusters();
+    pc.FindMostTalkativeUserList();
+    pc.FindLeastTalkativeUserList();
+    pc.GetCumulativeHistogramTotals();
     t = pc.GetPeakMessagingTimestampList();
     uu = pc.FindMostTalkativeUserListPerClusterList();
     uul = pc.FindLeastTalkativeUserListPerClusterList();
     tcsl = pc.GenerateTimestampClusterSummaryList();
     summ = pc.GenerateConversationSummary();
+    console.log(pc.GetInterestingWordCountPerUser());
     hist = pc.DataToFrequencyHistogram();
-    
     /*for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();
         var end = pc.GetTimestampClusterList()[i].GetEndIndex();

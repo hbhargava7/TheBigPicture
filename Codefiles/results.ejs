@@ -300,16 +300,22 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div id="leftWrapper">
-                                <h2>Here will magically appear content.</h2>
+                                <h2>Global Analysis.</h2>
                                 <br>
-                                <p>This project was conceived at Berkeley CalHacks 2.0.</p>
-                                <br>
-                                <p>hello@floor5.com</p>
+                                <p>Start Date:<span id="startDate"></span></p>
+                                <p>End Date:<span id="endDate"></span></p>
+                                <p>Total Messages:<span id="messageCount"></span></p>
+                                <p>Most Talkative:<span id="mostTalkative"></span></p>
+                                <p>Least Talkative:<span id="leastTalkative"></span></p>
+                                <p>Conversation Summary:<span id="summary"></span></p>
+                                                                                                        <p>Users:<span id="users"></span></p>
+
+
                                 <br>
                             </div>
                         </div>
                         <div class="col-md-8" id="analysis">
-                            <h2 style="margin-left:5%">Analysis</h2>
+                            <h2 style="margin-left:5%">Graphic Analysis.</h2>
 
                             
                         </div>
@@ -322,9 +328,24 @@
 
         <script>
 
-            
+        
         var data = <%- JSON.stringify(graphData) %>;
+        //setup globals
+        document.getElementById('startDate').innerHTML = data.start_date;
+        document.getElementById('endDate').innerHTML = data.end_date;
+        document.getElementById('messageCount').innerHTML = data.total_messages;
+        document.getElementById('mostTalkative').innerHTML = data.conversation_most_talkative;
+        document.getElementById('summary').innerHTML = data.conversation_least_talkative;
+        document.getElementById('summary').innerHTML = data.conversation_summary;
+        document.getElementById('users').innerHTML = data.users;
 
+
+
+
+
+
+        
+        //setup graph
         draw(data);
 
         function draw(data) {
@@ -362,7 +383,8 @@
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d, i) {
-                return "Messages: <span style='color:red'>" + d + "</span><br>" 
+                return  "Start: " + "<span style='color:red'>" + data.starting_times[i] + "</span><br>"
+                        + "Messages: <span style='color:red'>" + d + "</span><br>" 
                         + "Most Talkative: " + "<span style='color:red'>" + data.most_talkative[i] + "</span><br>"
                         + "Least Talkative: " + "<span style='color:red'>" + data.least_talkative[i] + "</span><br>"
                         + "Summary: " + "<span style='color:red'>" + data.summaries[i] + "</span>";

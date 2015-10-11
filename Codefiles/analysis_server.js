@@ -712,6 +712,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     tcsl = pc.GenerateTimestampClusterSummaryList();
     summ = pc.GenerateConversationSummary();
     hist = pc.DataToFrequencyHistogram();
+    
     /*for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();
         var end = pc.GetTimestampClusterList()[i].GetEndIndex();

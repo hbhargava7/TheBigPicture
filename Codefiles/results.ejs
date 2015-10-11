@@ -316,15 +316,13 @@ text {
                                 <h2><span style="color:DodgerBlue">Interesting Groupings.</span></h2>
                                 
 
-                                <p>Users:<span id="users"></span></p>
+                                <p>Users: <span id="users"></span></p>
                                 <br>
-                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'fuck':</span></span><span id="containingFuck"></span></p>
-                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'hate':</span></span><span id="containingHate"></span></p>
-                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'love':</span></span><span id="containingLove"></span></p>
-                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'hate':</span></span><span id="containingShit"></span></p>
-                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'kill':</span></span><span id="containingKill"></span></p>
-
-
+                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'fuck': </span></span><span id="containingFuck"></span></p>
+                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'hate': </span></span><span id="containingHate"></span></p>
+                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'love': </span></span><span id="containingLove"></span></p>
+                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'hate': </span></span><span id="containingShit"></span></p>
+                                <p><span style="color:DodgerBlue">Message containing <span style="color:red">'kill': </span></span><span id="containingKill"></span></p>
                                 <br>
                             </div>
 
@@ -352,18 +350,37 @@ text {
 
     
     var data = <%- JSON.stringify(graphData) %>;
+
+        function PrettyPrintList(list) {
+            var ret = '';
+            for(var i = 0; i < list.length; i++) {
+                ret += list[i];
+                if(i !== list.length - 1) {
+                    ret += ', ';
+                }
+            }
+            return ret;
+        }
+
+        function ConfirmEmailSubmission(user_id, email, raw_data) {
+            if(confirm("Would you like the raw generated data to be sent to you by email?") === true) {
+                window.open('mailto:' + email + '?subject=Here\'s the conversation data that you requested ' + user_id + '!&body=' + JSON.stringify(raw_data));
+            }
+        }
+
+        ConfirmEmailSubmission(data.user_id, data.email, data);
     
         //setup globals
         document.getElementById('startDate').innerHTML = "&nbsp" + data.start_date;
         document.getElementById('endDate').innerHTML = "&nbsp" + data.end_date;
         document.getElementById('messageCount').innerHTML = "&nbsp" + data.total_messages;
-        document.getElementById('mostProbableCouple').innerHTML = "&nbsp" + data.most_probable_couple;
+        document.getElementById('mostProbableCouple').innerHTML = "&nbsp" + (data.most_probable_couple[1] === '' ? data.most_probable_couple[0] : PrettyPrintList(data.most_probable_couple));
         document.getElementById('mostLonelyUser').innerHTML = "&nbsp" + data.most_lonely_users[0][0];
         document.getElementById('messageCount').innerHTML = "&nbsp" + data.total_messages;
-        document.getElementById('mostTalkative').innerHTML = "&nbsp" + data.conversation_most_talkative;
-        document.getElementById('leastTalkative').innerHTML = "&nbsp" + data.conversation_least_talkative;
-        document.getElementById('summary').innerHTML = "&nbsp" + data.conversation_summary;
-        document.getElementById('users').innerHTML = data.users;
+        document.getElementById('mostTalkative').innerHTML = "&nbsp" + PrettyPrintList(data.conversation_most_talkative);
+        document.getElementById('leastTalkative').innerHTML = "&nbsp" + PrettyPrintList(data.conversation_least_talkative);
+        document.getElementById('summary').innerHTML = "&nbsp" + (data.conversation_summary);
+        document.getElementById('users').innerHTML = PrettyPrintList(data.users);
 
                 //populate groupings
         document.getElementById('containingFuck').innerHTML = "&nbsp" + data.interesting_word_conversations[0].join("<br />");

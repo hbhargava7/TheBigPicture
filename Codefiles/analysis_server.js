@@ -25,7 +25,7 @@ app.get('/', function(req, res){
 app.post('/', function(req, res) {
     var user_id = req.body.id;
     var email = req.body.email;
-    var token = "placeholder"
+    var token = "placeholder";
     var format = req.body.contentFormat;
     var content = req.body.content;
 
@@ -78,6 +78,48 @@ SkypeMessageParser.prototype.ParseMessageText = function() {
         var date = new Date(day);
         var time = line.substring(line.indexOf(',')+2, line.indexOf(']')-3);
         var PM = ((line.substring(line.indexOf(',')+2, line.indexOf(']'))).indexOf("AM") === - 1);
+        time = time.split(":");
+        if (PM && parseInt(time[0]) !== 12){
+            time[0] = String(parseInt(time[0]) + 12);
+        }
+        date.setHours(time[0],time[1],time[2]);
+        name = line.substring(line.indexOf(']')+2, line.indexOf(':', line.indexOf(']')));
+        message = line.substring(line.indexOf(':', line.indexOf(']'))+2, line.length)
+        if (name.indexOf("sent a file") != -1){
+            name = name.substring(0,name.indexOf("sent a file"));
+            i++;
+            message = arrayOfLines[i];
+        }
+        if(time[0] !== 'NaN')
+            this.ReceivedMessageList.push(new ReceivedMessage(name, date.getTime(), message));
+    }
+    return this.ReceivedMessageList;
+};
+
+var SkypeMessageParser2 = function(text) {
+    this.MessageText = text;
+    this.ReceivedMessageList = [];
+};
+
+SkypeMessageParser2.prototype.GetMessageText = function() {
+    return this.MessageText;
+};
+
+SkypeMessageParser2.prototype.GetReceivedMessageList = function() {
+    return this.ReceivedMessageList;
+};
+
+SkypeMessageParser2.prototype.ParseMessageText = function() {
+    var arrayOfLines = this.MessageText.match(/[^\r\n]+/g);
+    var line = "";
+    var msgs = [];
+    for (var i = 0; i < arrayOfLines.length; i++) {
+        line = arrayOfLines[i];
+        var all = line.substring(line.indexOf('[') + 1, line.indexOf(']')).split(' ');
+        var day = all[0];
+        var date = new Date(day);
+        var time = all[1];
+        var PM = ((line.substring(line.indexOf(' ')+2, line.indexOf(']'))).indexOf("AM") === - 1);
         time = time.split(":");
         if (PM && parseInt(time[0]) !== 12){
             time[0] = String(parseInt(time[0]) + 12);
@@ -894,13 +936,11 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
             "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toLocaleString(), "total_messages": this.OrderedMessageList.length,
             "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9, "trimmed": this.Trimmed,
             "interesting_word_conversations": temp12, "per_interesting_words_per_user": temp13, "cumulative_histogram": temp14, "most_lonely_users": temp15,
-            "most_probable_couple": temp17, "ending_times": temp16};
+            "most_probable_couple": temp17, "ending_times": temp16, "email": email, "user_id": user_id};
 };
-    
-    var finalArray = [];
-    var finalString = "";
-    
-    var parser = new FacebookMessageParser(content);
+
+function GeneratedFrontEndData(parser_kind, content) {
+    var parser = new parser_kind(content);
     parser.ParseMessageText();
     var pc = new Conversation(parser.GetReceivedMessageList());
     pc.PreprocessMessageList();
@@ -916,60 +956,26 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     ml = pc.GetMostLonelyList();
     pc.GetInterestingWordList();
     pc.GetCoupleList();
-    hist = pc.DataToFrequencyHistogram();
-    /*for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
-        var start = pc.GetTimestampClusterList()[i].GetStartIndex();
-        var end = pc.GetTimestampClusterList()[i].GetEndIndex();
-        finalString += "Most Talkative Users: ";
-        for(var j = 0; j < uu[i].length; j++) {
-            finalString += (uu[i][j].GetUserName()) + "\n";
-            for(var h = 0; h < uu[i][j].GetLinkList().length; h++) {
-                finalString += uu[i][j].GetLinkList()[h] + "\n";
-            }
-            var word_dist = uu[i][j].GenerateWordDistributionList();
-            for(var c = 0; c < word_dist.length; c++) {
-                var to_print = word_dist[c].GetText() + ": ";
-                for(var d = 0; d < word_dist[c].GetFrequency(); d++) {
-                    to_print += "*";
-                }
-                finalString += to_print + "\n";
-            }
-            finalString += "--------------\n"
-        }
-        finalString += "Least Talkative Users: ";
-        for(var j = 0; j < uul[i].length; j++) {
-            finalString += (uul[i][j].GetUserName()) + "\n";
-            for(var h = 0; h < uul[i][j].GetLinkList().length; h++) {
-                finalString += uul[i][j].GetLinkList()[h] + "\n";
-            }
-            var word_dist = uu[i][j].GenerateWordDistributionList();
-            for(var c = 0; c < word_dist.length; c++) {
-                var to_print = word_dist[c].GetText() + ": ";
-                for(var d = 0; d < word_dist[c].GetFrequency(); d++) {
-                    to_print += "*";
-                }
-                finalString += to_print + "\n";
-            }
-            finalString += "--------------\n"
-        }
-        finalString += "Start Time: " + new Date(pc.GetTimestampClusterList()[i].GetStartTimestamp()).toString() + "\n";
-        finalString += "Summary: " + tcsl[i] + "\n";
-        for(var j = start; j < end; j++) {
-            finalArray.push((pc.GetOrderedDecoratedMessageList()[j].ToString()));
-            finalString += ('*');
-        }
-        finalString += "\n"
+    return pc.DataToFrequencyHistogram();
+}
 
-        finalArray.push(('==============='));
-        finalString += ('===============');
-        finalString += "\n";
-    }*/
-  
-    //    res.writeHead(200, {
-    //        'Content-Type': 'text/html',
-    //
-    //    });
-        res.render('results', { graphData : hist });
+var parser = null;
+switch(format) {
+    case "skype":
+        parser = SkypeMessageParser;
+        break;
+    case "skype_alt":
+        parser = SkypeMessageParser2;
+        break;
+    case "facebook":
+        parser = FacebookMessageParser;
+        break;
+    default:
+        break;
+}
+hist = GeneratedFrontEndData(parser, content);
+res.render('results', { graphData : hist });
+
 });
 
 //Incept server

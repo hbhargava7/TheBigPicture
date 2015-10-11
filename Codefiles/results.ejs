@@ -17,8 +17,17 @@
         top: 0px;
         left: 0px;
         width: 100%;
-        min-height: 500px;
+        min-height: 1000px;
+                    overflow: scroll !important;
+
     }
+        * {
+            overflow: scroll !important;
+        }
+        
+        body {
+            overflow: scroll !important;
+        }
     h1 {
         font-family: 'Open Sans', sans-serif;
         font-weight: lighter;
@@ -314,11 +323,16 @@ text {
                                 <br>
                             </div>
                         </div>
-                        <div class="col-md-8" id="analysis">
-                            <h2 style="margin-left:5%">Graphic Analysis.</h2>
+                        <div class="col-md-8">
+                            <div id="analysis">
+                                <h2 style="margin-left:5%">Graphic Analysis.</h2>
 
+                            </div>
+                            <div id="analysis1">
+                            </div>
                             
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -343,7 +357,6 @@ text {
         //setup activity graph
         graphActivity(data);
         graphCumulativeActivity(data);
-        graphWordUsage(data);
         
         function graphActivity(data) {
                 var margin = {
@@ -430,7 +443,7 @@ text {
                     "bottom": 30,
                     "left": 50
                 },
-                width = $("#analysis").width()-20,
+                width = $("#analysis1").width()-20,
                 height = 500;
 
                 var x = d3.scale.ordinal()
@@ -439,14 +452,14 @@ text {
                 .rangeRoundBands([0, width], 0);
 
                 var y = d3.scale.linear()
-                .domain([0, d3.max(data.cumulative_values)])
+                .domain([0, d3.max(data.cumulative_histogram)])
                 .range([height, 0]);
 
                 var xAxis = d3.svg.axis().scale(x).orient("bottom");
 
                 var yAxis = d3.svg.axis().scale(y).orient("left");
 
-                var svgContainer = d3.select($("#analysis")[0]).append("svg")
+                var svgContainer = d3.select($("#analysis1")[0]).append("svg")
                 .attr("class", "chart")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom).append("g")
@@ -457,9 +470,6 @@ text {
                 .attr("class", "x axis")
                 .attr("transform", "translate( 0," + height + ")")
                 .call(xAxis);
-
-                svgContainer.call(tip);
-
 
                 svgContainer.append("g")
                 .attr("class", "y axis").call(yAxis)
@@ -483,109 +493,11 @@ text {
                 })
                 .attr("height", function(d) {
                     return height -y(d);
-                }).on('mouseover', tip.show)
-                .on('mouseout', tip.hide);
+                });
             }
         
-            function graphWordUsage(data) {
-                var margin = {
-                    "top": 10,
-                    "right": 10,
-                    "bottom": 30,
-                    "left": 50
-                },
-                width = $("#analysis").width()-20,
-                height = 500;
-
-                var x0 = d3.scale.ordinal()
-                    .rangeRoundBands([0, width], .1);
-
-                var x1 = d3.scale.ordinal();
-
-                var y = d3.scale.linear()
-                    .range([height, 0]);
-
-                var color = d3.scale.ordinal()
-                    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-                var xAxis = d3.svg.axis()
-                    .scale(x0)
-                    .orient("bottom");
-
-                var yAxis = d3.svg.axis()
-                    .scale(y)
-                    .orient("left")
-                    .tickFormat(d3.format(".2s"));
-
-                var svg = d3.select($("#analysis")).append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                  .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-                //Agenames
-                  var wordsGraphed = ["fuck", "hate", "love", "shit", "kill"];
-
-                  data.forEach(function(d) {
-                    d.ages = wordsGraphed.map(function(name) { return {name: name, value: +d[name]}; });
-                  });
-
-                  x0.domain(data.map(function(d) { return d.State; }));
-                  x1.domain(wordsGraphed).rangeRoundBands([0, x0.rangeBand()]);
-                  y.domain([0, d3.max(data, function(d) { return d3.max(d.ages, function(d) { return d.value; }); })]);
-
-                  svg.append("g")
-                      .attr("class", "x axis")
-                      .attr("transform", "translate(0," + height + ")")
-                      .call(xAxis);
-
-                  svg.append("g")
-                      .attr("class", "y axis")
-                      .call(yAxis)
-                    .append("text")
-                      .attr("transform", "rotate(-90)")
-                      .attr("y", 6)
-                      .attr("dy", ".71em")
-                      .style("text-anchor", "end")
-                      .text("Population");
-
-                  var state = svg.selectAll(".state")
-                      .data(data)
-                    .enter().append("g")
-                      .attr("class", "g")
-                      .attr("transform", function(d) { return "translate(" + x0(d.State) + ",0)"; });
-
-                  state.selectAll("rect")
-                      .data(function(d) { return d.ages; })
-                    .enter().append("rect")
-                      .attr("width", x1.rangeBand())
-                      .attr("x", function(d) { return x1(d.name); })
-                      .attr("y", function(d) { return y(d.value); })
-                      .attr("height", function(d) { return height - y(d.value); })
-                      .style("fill", function(d) { return color(d.name); });
-
-                  var legend = svg.selectAll(".legend")
-                      .data(ageNames.slice().reverse())
-                    .enter().append("g")
-                      .attr("class", "legend")
-                      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-                  legend.append("rect")
-                      .attr("x", width - 18)
-                      .attr("width", 18)
-                      .attr("height", 18)
-                      .style("fill", color);
-
-                  legend.append("text")
-                      .attr("x", width - 24)
-                      .attr("y", 9)
-                      .attr("dy", ".35em")
-                      .style("text-anchor", "end")
-                      .text(function(d) { return d; });
-
-                );   
-            }
+            
+            
             
         
         </script>

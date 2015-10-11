@@ -770,6 +770,7 @@ Conversation.prototype.GetMostLonelyList = function() {
         var msg = this.OrderedMessageList[ind].GetMessage();
         var find = temp.indexOf(user);
         if(find == -1) {
+            temp.push(user);
             ret.push([user, [msg]]);
         }
         else {
@@ -838,7 +839,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     }
     var temp13 = this.PerInterestingWordData;
     var temp14 = this.CumulativeHistogramTotalList;
-    console.log(temp15);
+    console.log(this.MostLonelyList.length);
     return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
             "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.TimestampClusterList[0].GetStartTimestamp()).toLocaleString(),
             "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toLocaleString(), "total_messages": this.OrderedMessageList.length,

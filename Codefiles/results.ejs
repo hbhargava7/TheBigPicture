@@ -295,7 +295,7 @@ text {
                 <div id="main">
                     <div class="container-fluid">
                         <h1 style="margin-bottom:15px;">FLOOR5DEV: CHAT ANALYSIS.</h1>
-                        <p style="text-align: center;">Hersh | Nikhil | Denis | Daniel | Nanxi | Annie | Julie</p>
+                        <p style="text-align: center;">Hersh | Nikhil | Denis | Nanxi | Julie</p>
                     </div>
 
                     <div class="row">
@@ -306,9 +306,13 @@ text {
                                 <p>Start Date:<span id="startDate"></span></p>
                                 <p>End Date:<span id="endDate"></span></p>
                                 <p>Total Messages:<span id="messageCount"></span></p>
+                                <p>Most Probable Couple:<span id="mostProbableCouple"></span></p>
+                                <p>Lonliest Member:<span id="mostLonelyUser"></span></p>
                                 <p>Most Talkative:<span id="mostTalkative"></span></p>
                                 <p>Least Talkative:<span id="leastTalkative"></span></p>
                                 <p>Conversation Summary:<span id="summary"></span></p>
+                                <br>
+
                                 <p>Users:<span id="users"></span></p>
 
 
@@ -317,10 +321,12 @@ text {
                         </div>
                         <div class="col-md-8">
                             <div id="analysis">
-                                <h2 style="margin-left:5%">Graphic Analysis.</h2>
+                                <h2 style="margin-left:5%">Graphic Analysis (Usage).</h2>
 
                             </div>
                             <div id="analysis1">
+                                <h2 style="margin-left:5%">Graphic Analysis (Cumulative Usage).</h2>
+
                             </div>
                             
                         </div>
@@ -340,6 +346,9 @@ text {
         //setup globals
         document.getElementById('startDate').innerHTML = "&nbsp" + data.start_date;
         document.getElementById('endDate').innerHTML = "&nbsp" + data.end_date;
+        document.getElementById('messageCount').innerHTML = "&nbsp" + data.total_messages;
+        document.getElementById('mostProbableCouple').innerHTML = "&nbsp" + data.most_probable_couple;
+        document.getElementById('mostLonelyUser').innerHTML = "&nbsp" + data.most_lonely_users;
         document.getElementById('messageCount').innerHTML = "&nbsp" + data.total_messages;
         document.getElementById('mostTalkative').innerHTML = "&nbsp" + data.conversation_most_talkative;
         document.getElementById('leastTalkative').innerHTML = "&nbsp" + data.conversation_least_talkative;
@@ -392,7 +401,6 @@ text {
                     + "Summary: " + "<span style='color:red'>" + data.summaries[i] + "</span>";
 
                 })
-
 
                 svgContainer.append("g")
                 .attr("class", "x axis")

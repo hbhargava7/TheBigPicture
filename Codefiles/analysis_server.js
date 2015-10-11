@@ -833,6 +833,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp9 = [];
     var temp12 = [];
     var temp15 = [];
+    var temp16 = [];
     var inner_most = this.MostTalkativeUserListPerClusterList; 
     var inner_least = this.LeastTalkativeUserListPerClusterList;
     for(var i = 0; i < this.GetTimestampClusterList().length; i++) {
@@ -850,6 +851,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
         temp4.push(temp_least);
         temp5.push(this.TimestampClusterSummaryList[i]);
         temp6.push(new Date(this.TimestampClusterList[i].GetStartTimestamp()).toLocaleString());
+        temp16.push(new Date(this.TimestampClusterList[i].GetEndTimestamp()).toLocaleString());
     }
     for(var i = 0; i < this.MostTalkativeUserList.length; i++) {
         temp7.push(this.MostTalkativeUserList[i].GetUserName());
@@ -873,7 +875,6 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
         }
     }
     temp12 = this.InterestingWordList;
-    console.log(temp12);
     var temp13 = this.PerInterestingWordData;
     var temp14 = this.CumulativeHistogramTotalList;
     return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
@@ -881,7 +882,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
             "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toLocaleString(), "total_messages": this.OrderedMessageList.length,
             "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9, "trimmed": this.Trimmed,
             "interesting_word_conversations": temp12, "per_interesting_words_per_user": temp13, "cumulative_histogram": temp14, "most_lonely_users": temp15,
-            "most_probable_couple": ""};
+            "most_probable_couple": "", "ending_times": temp16};
 };
     
     var finalArray = [];
@@ -903,6 +904,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     ml = pc.GetMostLonelyList();
     pc.GetInterestingWordList();
     hist = pc.DataToFrequencyHistogram();
+    console.log()
     /*for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();
         var end = pc.GetTimestampClusterList()[i].GetEndIndex();

@@ -648,6 +648,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp3 = [];
     var temp4 = [];
     var temp5 = [];
+    var temp6 = [];
     var inner_most = this.MostTalkativeUserListPerClusterList; 
     var inner_least = this.LeastTalkativeUserListPerClusterList;
     for(var i = 0; i < this.GetTimestampClusterList().length; i++) {
@@ -664,8 +665,10 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
         temp3.push(temp_most);
         temp4.push(temp_least);
         temp5.push(this.TimestampClusterSummaryList[i]);
+        temp6.push(new Date(this.TimestampClusterList[i].GetStartTimestamp()));
     }
-    return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5};
+    return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
+            "starting_times": temp6};
 };
     
     var finalArray = [];

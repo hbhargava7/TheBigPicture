@@ -366,11 +366,11 @@ text {
         document.getElementById('users').innerHTML = data.users;
 
                 //populate groupings
-        if (data.containing_fuck) document.getElementById('containingFuck').innerHTML = "&nbsp" + data.containing_fuck.join("<br />");
-        if (data.containing_hate) document.getElementById('containingHate').innerHTML = "&nbsp" + data.containing_hate.join("<br />");
-        if (data.containing_love) document.getElementById('containingLove').innerHTML = "&nbsp" + data.containing_love.join("<br />");
-        if (data.containing_shit) document.getElementById('containingShit').innerHTML = "&nbsp" + data.containing_shit.join("<br />");
-        if (data.containing_kill) document.getElementById('containingKill').innerHTML = "&nbsp" + data.containing_kill.join("<br />");
+        document.getElementById('containingFuck').innerHTML = "&nbsp" + data.interesting_word_conversations[0].join("<br />");
+        document.getElementById('containingHate').innerHTML = "&nbsp" + data.interesting_word_conversations[1].join("<br />");
+        document.getElementById('containingLove').innerHTML = "&nbsp" + data.interesting_word_conversations[2].join("<br />");
+        document.getElementById('containingShit').innerHTML = "&nbsp" + data.interesting_word_conversations[3].join("<br />");
+        document.getElementById('containingKill').innerHTML = "&nbsp" + data.interesting_word_conversations[4].join("<br />");
         //setup activity graph
         graphActivity(data);
         graphCumulativeActivity(data);
@@ -411,6 +411,7 @@ text {
                 .offset([-10, 0])
                 .html(function(d, i) {
                     return  "Start: " + "<span style='color:red'>" + data.starting_times[i] + "</span><br>"
+                    + "End: <span style='color:red'>" + data.ending_times[i] + "</span><br>" 
                     + "Messages: <span style='color:red'>" + d + "</span><br>" 
                     + "Most Talkative: " + "<span style='color:red'>" + data.most_talkative[i] + "</span><br>"
                     + "Least Talkative: " + "<span style='color:red'>" + data.least_talkative[i] + "</span><br>"

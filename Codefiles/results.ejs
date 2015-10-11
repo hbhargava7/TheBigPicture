@@ -257,6 +257,8 @@
               background: rgba(0, 0, 0, 0.8);
               color: #fff;
               border-radius: 2px;
+                max-width: 250px;
+                word-wrap: normal;
             }
 
             /* Creates a small triangle extender for the tooltip */
@@ -348,8 +350,6 @@
             var xAxis = d3.svg.axis().scale(x).orient("bottom");
 
             var yAxis = d3.svg.axis().scale(y).orient("left");
-
-
             
             var svgContainer = d3.select($("#analysis")[0]).append("svg")
                 .attr("class", "chart")
@@ -362,7 +362,11 @@
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d, i) {
-                return "<strong>Value:</strong> <span style='color:red'>" + d + "\n" + "Talker: " + data.most_talkative[i] + "</span>";
+                return "Messages: <span style='color:red'>" + d + "</span><br>" 
+                        + "Most Talkative: " + "<span style='color:red'>" + data.most_talkative[i] + "</span><br>"
+                        + "Least Talkative: " + "<span style='color:red'>" + data.least_talkative[i] + "</span><br>"
+                        + "Summary: " + "<span style='color:red'>" + data.summaries[i] + "</span>";
+                  
 //                return "<strong>Value:</strong> <span style='color:red'>" + d + "</span>";
 
               })

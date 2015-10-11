@@ -91,6 +91,55 @@ SkypeMessageParser.prototype.ParseMessageText = function() {
     return this.ReceivedMessageList;
 };
 
+var FacebookMessageParser = function(text) {
+    this.MessageText = text;
+    this.ReceivedMessageList = [];
+}
+
+FacebookMessageParser.prototype.GetMessageText = function() {
+    return this.MessageText;
+}
+
+FacebookMessageParser.prototype.GetReceivedMessageList = function() {
+    return this.ReceivedMessageList;
+}
+
+FacebookMessageParser.prototype.ParseMessageText = function() {
+    function isUpperCase(aCharacter) {    
+        return (aCharacter >= 'A') && (aCharacter <= 'Z');
+    };
+    var arrayOfLines = this.MessageText.match(/[^\r\n]+/g);
+    var msgs = [];
+    for (var i = 0; i < (arrayOfLines.length) - 1;) {
+        timeline = arrayOfLines[i];
+        var name = timeline.substring(0, timeline.indexOf(','));
+        for (var j = name.length; j > 0; j--) {
+            if (isUpperCase(name[j])){ 
+                break; 
+            }
+            var captial = j;
+        } 
+        var name = timeline.substring(0, captial-1);
+        var PM = timeline.substring(timeline.indexOf(":")).indexOf("am") === -1;
+        var day = timeline.substring(captial-1, timeline.indexOf(":")+3);
+        day = day.replace(" at", ",");
+        day = new Date(day);
+        if (PM && day.getHours() != 12){
+            day.setHours(day.getHours() + 12);
+        }
+        i++;
+        var message = arrayOfLines[i];
+        var testday = message.substring(",", timeline.indexOf(":")+3);
+        testday = testday.replace(" at", ",");
+        testday = new Date(testday);
+        if (testday.toString() === "Invalid Date"){
+            this.ReceivedMessageList.push(new ReceivedMessage(name, day.getTime(), message));
+        }
+        i++;
+    }
+    return this.ReceivedMessageList;
+};
+
 var Word = function(word, freq) {
     this.Text = word;
     this.Frequency = freq;
@@ -324,6 +373,7 @@ var Conversation = function(ReceivedMessageList) {
     this.LeastTalkativeUserListPerClusterList = [];
     this.TimestampClusterSummaryList = [];
     this.Summary = [];
+    this.Trimmed = false;
 };
 
 Conversation.prototype.GetReceivedMessageList = function() {
@@ -367,22 +417,44 @@ Conversation.prototype.PreprocessMessageList = function() {
 
 Conversation.prototype.FindTimestampClusters = function(margin) {
     if (typeof(margin) === "undefined") {
-        margin = 5 * 60 * 1000;  // 15 minutes in milliseconds   
+        margin = 20 * 60 * 1000;  // 15 minutes in milliseconds   
     }
     var prev_index = 0;
     var current_time = this.OrderedMessageList[0].GetTimestamp();
     var prev_time = this.OrderedMessageList[0].GetTimestamp();
+    var temp = [];
     for(var i = 1; i < this.OrderedMessageList.length; i++) {
         if(Math.abs(this.OrderedMessageList[i].GetTimestamp() - current_time) <= margin) {
         }
         else {
-            this.TimestampClusterList.push(new TimestampCluster(prev_index, i, prev_time, this.OrderedMessageList[i].GetTimestamp()));
+            temp.push(new TimestampCluster(prev_index, i, prev_time, this.OrderedMessageList[i].GetTimestamp()));
             prev_index = i;
             prev_time = this.OrderedMessageList[i].GetTimestamp();
         }
         current_time = this.OrderedMessageList[i].GetTimestamp();
     }
-    this.TimestampClusterList.push(new TimestampCluster(prev_index, this.OrderedMessageList.length, prev_time, this.OrderedMessageList[this.OrderedMessageList.length - 1].GetTimestamp()));
+    temp.push(new TimestampCluster(prev_index, this.OrderedMessageList.length, prev_time, this.OrderedMessageList[this.OrderedMessageList.length - 1].GetTimestamp()));
+    if(temp.length > 500) {
+        var remove = Math.ceil(temp.length / 500);
+        for(var i = 0; i < temp.length; i += remove) {
+            var st = temp[i].GetStartTimestamp();
+            var si = temp[i].GetStartIndex();
+            var et = -1;
+            var ei = -1;
+            if(i + remove > temp.length - 1) {
+                ei = temp[temp.length - 1].GetEndIndex();
+                et = temp[temp.length - 1].GetEndTimestamp();
+            }
+            else {
+                ei = temp[i + remove].GetEndIndex();
+                et = temp[i + remove].GetEndTimestamp();
+            }
+            this.TimestampClusterList.push(new TimestampCluster(si, ei, st, et));
+        }
+    }
+    else {
+        this.TimestampClusterList = temp;
+    }
     return this.TimestampClusterList;
 };
 
@@ -551,6 +623,10 @@ Conversation.prototype.GetUserList = function() {
     return this.UserList;
 };
 
+Conversation.prototype.GetTrimmed = function() {
+    return this.Trimmed;
+}
+
 Conversation.prototype.GenerateTimestampClusterSummaryList = function() {
     for(var i = 0; i < this.TimestampClusterList.length; i++) {
         var raw_text = "";
@@ -566,14 +642,30 @@ Conversation.prototype.GenerateTimestampClusterSummaryList = function() {
     return this.TimestampClusterSummaryList;
 };
 
-Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
+Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp = [];
     var temp2 = [];
+    var temp3 = [];
+    var temp4 = [];
+    var temp5 = [];
+    var inner_most = this.MostTalkativeUserListPerClusterList; 
+    var inner_least = this.LeastTalkativeUserListPerClusterList;
     for(var i = 0; i < this.GetTimestampClusterList().length; i++) {
         temp.push(i);
         temp2.push(this.GetTimestampClusterList()[i].GetEndIndex() - this.GetTimestampClusterList()[i].GetStartIndex());
+        var temp_least = [];
+        var temp_most = [];
+        for(var j = 0; j < inner_most[i].length; j++) {
+            temp_most.push(inner_most[i][j].GetUserName());
+        }
+        for(var j = 0; j < inner_least[i].length; j++) {
+            temp_least.push(inner_least[i][j].GetUserName());
+        }
+        temp3.push(temp_most);
+        temp4.push(temp_least);
+        temp5.push(this.TimestampClusterSummaryList[i]);
     }
-    return {"buckets": temp, "values": temp2};
+    return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5};
 };
     
     var finalArray = [];
@@ -587,12 +679,12 @@ Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
     t = pc.GetPeakMessagingTimestampList();
     uu = pc.FindMostTalkativeUserListPerClusterList();
     uul = pc.FindLeastTalkativeUserListPerClusterList();
-    hist = pc.TimeClusterChatFrequencyToHistogram();
     tcsl = pc.GenerateTimestampClusterSummaryList();
-    for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
+    hist = pc.DataToFrequencyHistogram();
+    /*for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();
         var end = pc.GetTimestampClusterList()[i].GetEndIndex();
-        /*finalString += "Most Talkative Users: ";
+        finalString += "Most Talkative Users: ";
         for(var j = 0; j < uu[i].length; j++) {
             finalString += (uu[i][j].GetUserName()) + "\n";
             for(var h = 0; h < uu[i][j].GetLinkList().length; h++) {
@@ -623,7 +715,7 @@ Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
                 finalString += to_print + "\n";
             }
             finalString += "--------------\n"
-        }*/
+        }
         finalString += "Start Time: " + new Date(pc.GetTimestampClusterList()[i].GetStartTimestamp()).toString() + "\n";
         finalString += "Summary: " + tcsl[i] + "\n";
         for(var j = start; j < end; j++) {
@@ -635,7 +727,7 @@ Conversation.prototype.TimeClusterChatFrequencyToHistogram = function() {
         finalArray.push(('==============='));
         finalString += ('===============');
         finalString += "\n";
-    }
+    }*/
   
     //    res.writeHead(200, {
     //        'Content-Type': 'text/html',

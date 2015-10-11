@@ -21,9 +21,7 @@
                     overflow: scroll !important;
 
     }
-        * {
-            overflow: scroll !important;
-        }
+
         
         body {
             overflow: scroll !important;
@@ -417,7 +415,7 @@ text {
                 .attr("y", 6)
                 .attr("dy", ".71em")
                 .style("text-anchor", "end")
-                .text("Values");
+                .text("Value");
 
                 svgContainer.selectAll(".bar").data(data.values).enter().append("rect")
                 .attr("class", "bar")
@@ -465,12 +463,23 @@ text {
                 .attr("height", height + margin.top + margin.bottom).append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.right + ")");
 
+                var tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function(d, i) {
+                        return  "Bucket: " + "<span style='color:red'>" + i + "</span><br>"
+                                        + "Values: <span style='color:red'>" + d + "</span><br>";
+
+                })
 
                 svgContainer.append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate( 0," + height + ")")
                 .call(xAxis);
+                
+                svgContainer.call(tip);
 
+                
                 svgContainer.append("g")
                 .attr("class", "y axis").call(yAxis)
                 .append("text")
@@ -480,7 +489,7 @@ text {
                 .style("text-anchor", "end")
                 .text("Values");
 
-                svgContainer.selectAll(".bar").data(data.cumulative_values).enter().append("rect")
+                svgContainer.selectAll(".bar").data(data.cumulative_histogram).enter().append("rect")
                 .attr("class", "bar")
                 .attr("x", function(d, i) {
                     return i * x.rangeBand();
@@ -493,7 +502,8 @@ text {
                 })
                 .attr("height", function(d) {
                     return height -y(d);
-                });
+                }).on('mouseover', tip.show)
+                .on('mouseout', tip.hide);
             }
         
             

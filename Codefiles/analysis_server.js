@@ -376,6 +376,7 @@ var Conversation = function(ReceivedMessageList) {
     this.Trimmed = false;
     this.PerInterestingWordData = [];
     this.CumulativeHistogramTotalList = [];
+    this.MostLonelyList = [];
 };
 
 Conversation.prototype.GetReceivedMessageList = function() {
@@ -760,6 +761,25 @@ Conversation.prototype.GetCumulativeHistogramTotals = function() {
     return this.CumulativeHistogramTotalList;
 }
 
+Conversation.prototype.GetMostLonelyList = function() {
+    temp = [];
+    ret = [];
+    for(var i = 0; i < this.TimestampClusterList.length; i++) {
+        var ind = this.TimestampClusterList[i].GetEndIndex() - 1;
+        var user = this.OrderedMessageList[ind].GetUserName();
+        var msg = this.OrderedMessageList[ind].GetMessage();
+        var find = temp.indexOf(user);
+        if(find == -1) {
+            ret.push([user, [msg]]);
+        }
+        else {
+            ret[find][1].push(msg);
+        }
+    }
+    this.MostLonely = ret;
+    return this.MostLonely;
+}
+
 Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp = [];
     var temp2 = [];
@@ -771,6 +791,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp8 = [];
     var temp9 = [];
     var temp12 = [];
+    var temp15 = [];
     var inner_most = this.MostTalkativeUserListPerClusterList; 
     var inner_least = this.LeastTalkativeUserListPerClusterList;
     for(var i = 0; i < this.GetTimestampClusterList().length; i++) {
@@ -803,23 +824,27 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
             temp12.push(this.InterestingWordCountPerUser[0] + ": " + this.InterestingWordCountPerUser[2][j]);
         }
     }
+    var max = 0;
+    for(var i = 0; i < this.MostLonelyList.length; i++) {
+        if(this.MostLonelyList[i][1].length >= max) {
+            if(this.MostLonelyList[i][1].length == max) {
+                temp15.push([this.MostLonelyList[i]]);
+            }
+            else {
+                temp15 = [this.MostLonelyList[i]];
+                max = this.MostLonelyList[i][1].length;
+            }
+        }
+    }
     var temp13 = this.PerInterestingWordData;
     var temp14 = this.CumulativeHistogramTotalList;
-    console.log(temp12, temp13);
-    console.log(temp14);
-    console.log(temp7, temp8);
+    console.log(temp15);
     return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
             "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.TimestampClusterList[0].GetStartTimestamp()).toLocaleString(),
             "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toLocaleString(), "total_messages": this.OrderedMessageList.length,
             "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9, "trimmed": this.Trimmed,
-            "interesting_word_conversations": temp12, "per_interesting_words_per_user": temp13, "cumulative_histogram": temp14};
+            "interesting_word_conversations": temp12, "per_interesting_words_per_user": temp13, "cumulative_histogram": temp14, "most_lonely_users": temp15};
 };
-
-Conversation.prototype.MostLonely = function() {
-    temp = [];
-    ret = [];
-
-}
     
     var finalArray = [];
     var finalString = "";
@@ -837,7 +862,8 @@ Conversation.prototype.MostLonely = function() {
     uul = pc.FindLeastTalkativeUserListPerClusterList();
     tcsl = pc.GenerateTimestampClusterSummaryList();
     summ = pc.GenerateConversationSummary();
-    console.log(pc.GetInterestingWordCountPerUser());
+    ml = pc.GetMostLonelyList();
+    pc.GetInterestingWordCountPerUser();
     hist = pc.DataToFrequencyHistogram();
     /*for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();

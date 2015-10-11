@@ -888,7 +888,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     var finalArray = [];
     var finalString = "";
     
-    var parser = new FacebookMessageParser(content);
+    var parser = new SkypeMessageParser(content);
     parser.ParseMessageText();
     var pc = new Conversation(parser.GetReceivedMessageList());
     pc.PreprocessMessageList();

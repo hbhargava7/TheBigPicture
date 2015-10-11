@@ -312,9 +312,17 @@ text {
                                 <p>Least Talkative:<span id="leastTalkative"></span></p>
                                 <p>Conversation Summary:<span id="summary"></span></p>
                                 <br>
+                                <br>
+                                <h2>Interesting Groupings.</h2>
+                                
 
                                 <p>Users:<span id="users"></span></p>
-
+                                <br>
+                                <p>Message containing 'fuck': <span id="containingFuck"></span></p>
+                                <p>Message containing 'hate': <span id="containingHate"></span></p>
+                                <p>Message containing 'love': <span id="containingLove"></span></p>
+                                <p>Message containing 'shit': <span id="containingShit"></span></p>
+                                <p>Message containing 'kill': <span id="containingKill"></span></p>
 
                                 <br>
                             </div>
@@ -343,18 +351,26 @@ text {
     
     var data = <%- JSON.stringify(graphData) %>;
     
-        //setup globals
+        //populate globals
         document.getElementById('startDate').innerHTML = "&nbsp" + data.start_date;
         document.getElementById('endDate').innerHTML = "&nbsp" + data.end_date;
         document.getElementById('messageCount').innerHTML = "&nbsp" + data.total_messages;
         document.getElementById('mostProbableCouple').innerHTML = "&nbsp" + data.most_probable_couple;
-        document.getElementById('mostLonelyUser').innerHTML = "&nbsp" + data.most_lonely_users;
+        document.getElementById('mostLonelyUser').innerHTML = "&nbsp" + data.most_lonely_users[0][0];
         document.getElementById('messageCount').innerHTML = "&nbsp" + data.total_messages;
         document.getElementById('mostTalkative').innerHTML = "&nbsp" + data.conversation_most_talkative;
         document.getElementById('leastTalkative').innerHTML = "&nbsp" + data.conversation_least_talkative;
         document.getElementById('summary').innerHTML = "&nbsp" + data.conversation_summary;
         document.getElementById('users').innerHTML = data.users;
 
+        //populate groupings
+        if (data.containing_fuck) document.getElementById('containingFuck').innerHTML = "&nbsp" + data.containing_fuck.join("<br />");
+        if (data.containing_hate) document.getElementById('containingHate').innerHTML = "&nbsp" + data.containing_hate.join("<br />");
+        if (data.containing_love) document.getElementById('containingLove').innerHTML = "&nbsp" + data.containing_love.join("<br />");
+        if (data.containing_shit) document.getElementById('containingShit').innerHTML = "&nbsp" + data.containing_shit.join("<br />");
+        if (data.containing_kill) document.getElementById('containingKill').innerHTML = "&nbsp" + data.containing_kill.join("<br />");
+
+        
         //setup activity graph
         graphActivity(data);
         graphCumulativeActivity(data);

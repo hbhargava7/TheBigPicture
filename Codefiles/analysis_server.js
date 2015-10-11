@@ -45,7 +45,7 @@ app.post('/', function(req, res) {
     */
 
     //Server logic goes here.
-     var natural = require('natural');
+    var natural = require('natural');
     var nlp_compromise = require('nlp_compromise');
     var sum = require('sum');
 
@@ -84,7 +84,12 @@ SkypeMessageParser.prototype.ParseMessageText = function() {
         }
         date.setHours(time[0],time[1],time[2]);
         name = line.substring(line.indexOf(']')+2, line.indexOf(':', line.indexOf(']')));
-        var message = line.substring(line.indexOf(':', line.indexOf(']'))+2, line.length);
+        message = line.substring(line.indexOf(':', line.indexOf(']'))+2, line.length)
+        if (name.indexOf("sent a file") != -1){
+            name = name.substring(0,name.indexOf("sent a file"));
+            i++;
+            message = arrayOfLines[i];
+        }
         if(time[0] !== 'NaN')
             this.ReceivedMessageList.push(new ReceivedMessage(name, date.getTime(), message));
     }
@@ -761,6 +766,12 @@ Conversation.prototype.GetCumulativeHistogramTotals = function() {
     return this.CumulativeHistogramTotalList;
 }
 
+Conversation.prototype.GetMostProbableCouple = function() {
+    for(var i = 0; i < this.GetTimestampClusterList.length; i++) {
+
+    }
+}
+
 Conversation.prototype.GetMostLonelyList = function() {
     temp = [];
     ret = [];
@@ -777,8 +788,8 @@ Conversation.prototype.GetMostLonelyList = function() {
             ret[find][1].push(msg);
         }
     }
-    this.MostLonely = ret;
-    return this.MostLonely;
+    this.MostLonelyList = ret;
+    return this.MostLonelyList;
 }
 
 Conversation.prototype.DataToFrequencyHistogram = function() {
@@ -837,20 +848,21 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
             }
         }
     }
+    console.log(temp15);
     var temp13 = this.PerInterestingWordData;
     var temp14 = this.CumulativeHistogramTotalList;
-    console.log(this.MostLonelyList.length);
     return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
             "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.TimestampClusterList[0].GetStartTimestamp()).toLocaleString(),
             "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toLocaleString(), "total_messages": this.OrderedMessageList.length,
             "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9, "trimmed": this.Trimmed,
-            "interesting_word_conversations": temp12, "per_interesting_words_per_user": temp13, "cumulative_histogram": temp14, "most_lonely_users": temp15};
+            "interesting_word_conversations": temp12, "per_interesting_words_per_user": temp13, "cumulative_histogram": temp14, "most_lonely_users": temp15,
+            "most_probable_couple": ""};
 };
     
     var finalArray = [];
     var finalString = "";
     
-    var parser = new SkypeMessageParser(content);
+    var parser = new FacebookMessageParser(content);
     parser.ParseMessageText();
     var pc = new Conversation(parser.GetReceivedMessageList());
     pc.PreprocessMessageList();

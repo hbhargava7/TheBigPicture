@@ -1,290 +1,290 @@
 <html>
-    <head>
-        <title>Floor5Dev Chat Analysis — Input</title>
-        
-        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-        
-        <link href="css/normalize.css" rel="stylesheet" type="text/css">
-        <link href="css/main.css" rel="stylesheet" type="text/css">
+<head>
+    <title>Floor5Dev Chat Analysis — Input</title>
+    
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    
+    <link href="css/normalize.css" rel="stylesheet" type="text/css">
+    <link href="css/main.css" rel="stylesheet" type="text/css">
 
-        <style type="text/css">
-        #main-wrapper {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            width: 100%;
-            min-height: 500px;
-        }
-        h1 {
-            font-family: 'Open Sans', sans-serif;
-            font-weight: lighter;
-            text-align: center;
-            font-size: 40pt
-        }
-        select {
-            -webkit-appearance: none;
-            -webkit-border-radius: 0px;
+    <style type="text/css">
+    #main-wrapper {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        min-height: 500px;
+    }
+    h1 {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: lighter;
+        text-align: center;
+        font-size: 40pt
+    }
+    select {
+        -webkit-appearance: none;
+        -webkit-border-radius: 0px;
 
-            font-family: 'Open Sans', sans-serif;
-            font-size:17px;
-            display:block;
-            font-weight: lighter;
-            padding:10px;
-            width:90%;
-            margin-right: 5%;
-            margin-left: 5%;
-            height:40px;
-            border:none;
-            background:#1f1f1f;
-            margin-bottom:3px;
-            color:#FFF;
-             border-radius: 0px;
-            overflow: auto;
-            outline: none;
-            padding-right: 1em;
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
-            box-shadow: none;
-            -webkit-transition:background-color 0.2s ease-out;
-            -moz-transition:background-color 0.2s ease-out;
-            -o-transition:background-color 0.2s ease-out;
-            transition:background-color 0.2s ease-out
-        }
-        input {
-            font-family: 'Open Sans', sans-serif;
-            font-size:17px;
-            display:block;
-            font-weight: lighter;
-            padding:10px;
-            width:90%;
-            margin-right: 5%;
-            margin-left: 5%;
-            height:40px;
-            border:none;
-            background:#1f1f1f;
-            margin-bottom:3px;
-            color:#FFF;
-             border: none;
-            overflow: auto;
-            outline: none;
-            padding-right: 1em;
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
-            box-shadow: none;
-            -webkit-transition:background-color 0.2s ease-out;
-            -moz-transition:background-color 0.2s ease-out;
-            -o-transition:background-color 0.2s ease-out;
-            transition:background-color 0.2s ease-out
-        }
-        input.placeholder {
-            color:#a9a9a9
-        }
-        input:focus { 
-            background:#333
-        }
-        input.error {
-            background:#FF6800 
-        }
-        input.disabled {
-            color:#444
-        }
-        textarea { 
-            position: relative;
-            font-family: 'Open Sans', sans-serif;
-            font-size:17px;
-            display:block;
-            width:90%;
-            margin-right: 10%;
-            margin-left: 5%;
-            height:192px;
-            padding:10px;
-            background:#1f1f1f;
-            color:#FFF;
-            border: none;
-            overflow: auto;
-            outline: none;
-            margin-right: 1em;
-            margin-bottom: 3px;
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
-            box-shadow: none;
-            -webkit-transition:background-color 0.2s ease-out;
-            -moz-transition:background-color 0.2s ease-out;
-            -o-transition:background-color 0.2s ease-out;
-            transition:background-color 0.2s ease-out
-        }
-        textarea.placeholder {
-            color:#a9a9a9
-        }
-        textarea:focus { 
-            background:#333
-        }
-        textarea.error { 
-            background:#FF6800
-        }
-        textarea.disabled { 
-            color:#444
-        }
-        ::-webkit-input-placeholder {
-            color:#888
-        }
-        :-moz-placeholder {
-            color:#888
-        }
-        ::-moz-placeholder { 
-            color:#888
-        }
-        :-ms-input-placeholder {
-            color:#888
-        }
-        .error::-webkit-input-placeholder { 
-            color:#FFF
-        }
-        .error:-moz-placeholder { 
-            color:#FFF
-        }
-        .error::-moz-placeholder { 
-            color:#FFF
-        }
-        .error:-ms-input-placeholder { 
-            color:#FFF
-        }
-        .disabled::-webkit-input-placeholder {
-            color:#444
-        }
-        .disabled:-moz-placeholder {
-            color:#444
-        }
-        .disabled::-moz-placeholder {
-            color:#444
-        }
-        .disabled:-ms-input-placeholder {
-            color:#444
-        }
-        input[type=submit] {
-            overflow: hidden;   
-        }
-        #leftWrapper {
-            margin-left: 5%;
-            margin-right: 5%;
-            width: 90%
-        }
-        h2 {
-            font-family: 'Open Sans', sans-serif;
-            font-weight: lighter;
-        }
-        p {
-            font-family: 'Open Sans', sans-serif;
-            font-weight: lighter;  
-            font-size: 14pt;
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 0px;
-        }
-        ul li {
-            display: inline;   
-        }
-            .bar {
-          fill: steelblue;
-        }
+        font-family: 'Open Sans', sans-serif;
+        font-size:17px;
+        display:block;
+        font-weight: lighter;
+        padding:10px;
+        width:90%;
+        margin-right: 5%;
+        margin-left: 5%;
+        height:40px;
+        border:none;
+        background:#1f1f1f;
+        margin-bottom:3px;
+        color:#FFF;
+        border-radius: 0px;
+        overflow: auto;
+        outline: none;
+        padding-right: 1em;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+        -webkit-transition:background-color 0.2s ease-out;
+        -moz-transition:background-color 0.2s ease-out;
+        -o-transition:background-color 0.2s ease-out;
+        transition:background-color 0.2s ease-out
+    }
+    input {
+        font-family: 'Open Sans', sans-serif;
+        font-size:17px;
+        display:block;
+        font-weight: lighter;
+        padding:10px;
+        width:90%;
+        margin-right: 5%;
+        margin-left: 5%;
+        height:40px;
+        border:none;
+        background:#1f1f1f;
+        margin-bottom:3px;
+        color:#FFF;
+        border: none;
+        overflow: auto;
+        outline: none;
+        padding-right: 1em;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+        -webkit-transition:background-color 0.2s ease-out;
+        -moz-transition:background-color 0.2s ease-out;
+        -o-transition:background-color 0.2s ease-out;
+        transition:background-color 0.2s ease-out
+    }
+    input.placeholder {
+        color:#a9a9a9
+    }
+    input:focus { 
+        background:#333
+    }
+    input.error {
+        background:#FF6800 
+    }
+    input.disabled {
+        color:#444
+    }
+    textarea { 
+        position: relative;
+        font-family: 'Open Sans', sans-serif;
+        font-size:17px;
+        display:block;
+        width:90%;
+        margin-right: 10%;
+        margin-left: 5%;
+        height:192px;
+        padding:10px;
+        background:#1f1f1f;
+        color:#FFF;
+        border: none;
+        overflow: auto;
+        outline: none;
+        margin-right: 1em;
+        margin-bottom: 3px;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+        -webkit-transition:background-color 0.2s ease-out;
+        -moz-transition:background-color 0.2s ease-out;
+        -o-transition:background-color 0.2s ease-out;
+        transition:background-color 0.2s ease-out
+    }
+    textarea.placeholder {
+        color:#a9a9a9
+    }
+    textarea:focus { 
+        background:#333
+    }
+    textarea.error { 
+        background:#FF6800
+    }
+    textarea.disabled { 
+        color:#444
+    }
+    ::-webkit-input-placeholder {
+        color:#888
+    }
+    :-moz-placeholder {
+        color:#888
+    }
+    ::-moz-placeholder { 
+        color:#888
+    }
+    :-ms-input-placeholder {
+        color:#888
+    }
+    .error::-webkit-input-placeholder { 
+        color:#FFF
+    }
+    .error:-moz-placeholder { 
+        color:#FFF
+    }
+    .error::-moz-placeholder { 
+        color:#FFF
+    }
+    .error:-ms-input-placeholder { 
+        color:#FFF
+    }
+    .disabled::-webkit-input-placeholder {
+        color:#444
+    }
+    .disabled:-moz-placeholder {
+        color:#444
+    }
+    .disabled::-moz-placeholder {
+        color:#444
+    }
+    .disabled:-ms-input-placeholder {
+        color:#444
+    }
+    input[type=submit] {
+        overflow: hidden;   
+    }
+    #leftWrapper {
+        margin-left: 5%;
+        margin-right: 5%;
+        width: 90%
+    }
+    h2 {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: lighter;
+    }
+    p {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: lighter;  
+        font-size: 14pt;
+    }
+    ul {
+        list-style-type: none;
+        padding-left: 0px;
+    }
+    ul li {
+        display: inline;   
+    }
+    .bar {
+      fill: steelblue;
+  }
 
-        .bar:hover {
-          fill: brown;
-        }
+  .bar:hover {
+      fill: brown;
+  }
 
-        .axis {
-          font: 10px sans-serif;
-        }
+  .axis {
+      font: 10px sans-serif;
+  }
 
-        .axis path,
-        .axis line {
-          fill: none;
-          stroke: #fff;
-          shape-rendering: crispEdges;
-        }
+  .axis path,
+  .axis line {
+      fill: none;
+      stroke: #fff;
+      shape-rendering: crispEdges;
+  }
 
-        .x axis path {
-          display: none;
-        }
+  .x axis path {
+      display: none;
+  }
 
-        .axis path,
-        .axis line, {
-            fill: none;
-                stroke: white;
-            shape-rendering: crispEdges;
-        }
-            .tick {
-                opacity: 0;
-            }
-        .tick path{
-            fill: white;
-            stroke: white;
-            shape-rendering: crispEdges;
-        }
-            .x-axis line {
-                opacity: 0;
-            }
+  .axis path,
+  .axis line, {
+    fill: none;
+    stroke: white;
+    shape-rendering: crispEdges;
+}
+.tick {
+    opacity: 0;
+}
+.tick path{
+    fill: white;
+    stroke: white;
+    shape-rendering: crispEdges;
+}
+.x-axis line {
+    opacity: 0;
+}
 
-        .bar rect {
-          fill: steelblue;
-          shape-rendering: crispEdges;
-        }
+.bar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
 
-         text {
-          fill: #fff;
-        }
-        .x text {
-            fill: #000;
-        }
-        .axis path, .axis line {
-          fill: #000;
-          stroke: #fff;
-          shape-rendering: crispEdges;
-        }
+text {
+  fill: #fff;
+}
+.x text {
+    fill: #000;
+}
+.axis path, .axis line {
+  fill: #000;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
 
-            .y text {
-                fill: white;
-            }
-            .d3-tip {
-              line-height: 1;
-              font-weight: bold;
-              padding: 12px;
-              background: rgba(0, 0, 0, 0.8);
-              color: #fff;
-              border-radius: 2px;
-                max-width: 250px;
-                word-wrap: normal;
-            }
+.y text {
+    fill: white;
+}
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+  max-width: 250px;
+  word-wrap: normal;
+}
 
-            /* Creates a small triangle extender for the tooltip */
-            .d3-tip:after {
-              box-sizing: border-box;
-              display: inline;
-              font-size: 10px;
-              width: 100%;
-              line-height: 1;
-              color: rgba(0, 0, 0, 0.8);
-              content: "\25BC";
-              position: absolute;
-              text-align: center;
-            }
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
 
-            /* Style northward tooltips differently */
-            .d3-tip.n:after {
-              margin: -1px 0 0 0;
-              top: 100%;
-              left: 0;
-            }
-        </style>
-        
-        
-    </head>
-    <body>
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+</style>
+
+
+</head>
+<body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 
     
@@ -308,7 +308,7 @@
                                 <p>Most Talkative:<span id="mostTalkative"></span></p>
                                 <p>Least Talkative:<span id="leastTalkative"></span></p>
                                 <p>Conversation Summary:<span id="summary"></span></p>
-                                                                                                        <p>Users:<span id="users"></span></p>
+                                <p>Users:<span id="users"></span></p>
 
 
                                 <br>
@@ -323,33 +323,30 @@
                 </div>
             </div>
         </div>
-        </div>
-        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    </div>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
-        <script>
+    <script>
 
-        
-        var data = <%- JSON.stringify(graphData) %>;
+    
+    var data = <%- JSON.stringify(graphData) %>;
+    
         //setup globals
-        document.getElementById('startDate').innerHTML = data.start_date;
-        document.getElementById('endDate').innerHTML = data.end_date;
-        document.getElementById('messageCount').innerHTML = data.total_messages;
-        document.getElementById('mostTalkative').innerHTML = data.conversation_most_talkative;
-        document.getElementById('summary').innerHTML = data.conversation_least_talkative;
-        document.getElementById('summary').innerHTML = data.conversation_summary;
+        document.getElementById('startDate').innerHTML = "&nbsp" + data.start_date;
+        document.getElementById('endDate').innerHTML = "&nbsp" + data.end_date;
+        document.getElementById('messageCount').innerHTML = "&nbsp" + data.total_messages;
+        document.getElementById('mostTalkative').innerHTML = "&nbsp" + data.conversation_most_talkative;
+        document.getElementById('leastTalkative').innerHTML = "&nbsp" + data.conversation_least_talkative;
+        document.getElementById('summary').innerHTML = "&nbsp" + data.conversation_summary;
         document.getElementById('users').innerHTML = data.users;
 
-
-
-
-
-
+        //setup activity graph
+        graphActivity(data);
+        graphCumulativeActivity(data);
+        graphWordUsage(data);
         
-        //setup graph
-        draw(data);
-
-        function draw(data) {
-            var margin = {
+        function graphActivity(data) {
+                var margin = {
                     "top": 10,
                     "right": 10,
                     "bottom": 30,
@@ -358,60 +355,58 @@
                 width = $("#analysis").width()-20,
                 height = 500;
 
-            var x = d3.scale.ordinal()
+                var x = d3.scale.ordinal()
                 .domain(data.buckets.map(function(d) {
                     return d;}))
                 .rangeRoundBands([0, width], 0);
 
 
-            var y = d3.scale.linear()
+                var y = d3.scale.linear()
                 .domain([0, d3.max(data.values)])
                 .range([height, 0]);
 
-            var xAxis = d3.svg.axis().scale(x).orient("bottom");
+                var xAxis = d3.svg.axis().scale(x).orient("bottom");
 
-            var yAxis = d3.svg.axis().scale(y).orient("left");
-            
-            var svgContainer = d3.select($("#analysis")[0]).append("svg")
+                var yAxis = d3.svg.axis().scale(y).orient("left");
+
+                var svgContainer = d3.select($("#analysis")[0]).append("svg")
                 .attr("class", "chart")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom).append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.right + ")");
+                .attr("transform", "translate(" + margin.left + "," + margin.right + ")");
 
-            
-            var tip = d3.tip()
-              .attr('class', 'd3-tip')
-              .offset([-10, 0])
-              .html(function(d, i) {
-                return  "Start: " + "<span style='color:red'>" + data.starting_times[i] + "</span><br>"
-                        + "Messages: <span style='color:red'>" + d + "</span><br>" 
-                        + "Most Talkative: " + "<span style='color:red'>" + data.most_talkative[i] + "</span><br>"
-                        + "Least Talkative: " + "<span style='color:red'>" + data.least_talkative[i] + "</span><br>"
-                        + "Summary: " + "<span style='color:red'>" + data.summaries[i] + "</span>";
-                  
-//                return "<strong>Value:</strong> <span style='color:red'>" + d + "</span>";
 
-              })
-            
-            
-            svgContainer.append("g")
+                var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function(d, i) {
+                    return  "Start: " + "<span style='color:red'>" + data.starting_times[i] + "</span><br>"
+                    + "Messages: <span style='color:red'>" + d + "</span><br>" 
+                    + "Most Talkative: " + "<span style='color:red'>" + data.most_talkative[i] + "</span><br>"
+                    + "Least Talkative: " + "<span style='color:red'>" + data.least_talkative[i] + "</span><br>"
+                    + "Summary: " + "<span style='color:red'>" + data.summaries[i] + "</span>";
+
+                })
+
+
+                svgContainer.append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate( 0," + height + ")")
                 .call(xAxis);
 
-            svgContainer.call(tip);
+                svgContainer.call(tip);
 
-            
-            svgContainer.append("g")
+
+                svgContainer.append("g")
                 .attr("class", "y axis").call(yAxis)
                 .append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 6)
-                    .attr("dy", ".71em")
-                    .style("text-anchor", "end")
-                    .text("Values");
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Values");
 
-            svgContainer.selectAll(".bar").data(data.values).enter().append("rect")
+                svgContainer.selectAll(".bar").data(data.values).enter().append("rect")
                 .attr("class", "bar")
                 .attr("x", function(d, i) {
                     return i * x.rangeBand();
@@ -426,10 +421,175 @@
                     return height -y(d);
                 }).on('mouseover', tip.show)
                 .on('mouseout', tip.hide);
-        }
+            }
+        
+            function graphCumulativeActivity(data) {
+                var margin = {
+                    "top": 10,
+                    "right": 10,
+                    "bottom": 30,
+                    "left": 50
+                },
+                width = $("#analysis").width()-20,
+                height = 500;
+
+                var x = d3.scale.ordinal()
+                .domain(data.buckets.map(function(d) {
+                    return d;}))
+                .rangeRoundBands([0, width], 0);
+
+                var y = d3.scale.linear()
+                .domain([0, d3.max(data.cumulative_values)])
+                .range([height, 0]);
+
+                var xAxis = d3.svg.axis().scale(x).orient("bottom");
+
+                var yAxis = d3.svg.axis().scale(y).orient("left");
+
+                var svgContainer = d3.select($("#analysis")[0]).append("svg")
+                .attr("class", "chart")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom).append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.right + ")");
+
+
+                svgContainer.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate( 0," + height + ")")
+                .call(xAxis);
+
+                svgContainer.call(tip);
+
+
+                svgContainer.append("g")
+                .attr("class", "y axis").call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Values");
+
+                svgContainer.selectAll(".bar").data(data.cumulative_values).enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d, i) {
+                    return i * x.rangeBand();
+                })
+                .attr("y", function(d) {
+                    return y(d);
+                })
+                .attr("width", function(){
+                    return x.rangeBand();
+                })
+                .attr("height", function(d) {
+                    return height -y(d);
+                }).on('mouseover', tip.show)
+                .on('mouseout', tip.hide);
+            }
+        
+            function graphWordUsage(data) {
+                var margin = {
+                    "top": 10,
+                    "right": 10,
+                    "bottom": 30,
+                    "left": 50
+                },
+                width = $("#analysis").width()-20,
+                height = 500;
+
+                var x0 = d3.scale.ordinal()
+                    .rangeRoundBands([0, width], .1);
+
+                var x1 = d3.scale.ordinal();
+
+                var y = d3.scale.linear()
+                    .range([height, 0]);
+
+                var color = d3.scale.ordinal()
+                    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+                var xAxis = d3.svg.axis()
+                    .scale(x0)
+                    .orient("bottom");
+
+                var yAxis = d3.svg.axis()
+                    .scale(y)
+                    .orient("left")
+                    .tickFormat(d3.format(".2s"));
+
+                var svg = d3.select($("#analysis")).append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+                //Agenames
+                  var wordsGraphed = ["fuck", "hate", "love", "shit", "kill"];
+
+                  data.forEach(function(d) {
+                    d.ages = wordsGraphed.map(function(name) { return {name: name, value: +d[name]}; });
+                  });
+
+                  x0.domain(data.map(function(d) { return d.State; }));
+                  x1.domain(wordsGraphed).rangeRoundBands([0, x0.rangeBand()]);
+                  y.domain([0, d3.max(data, function(d) { return d3.max(d.ages, function(d) { return d.value; }); })]);
+
+                  svg.append("g")
+                      .attr("class", "x axis")
+                      .attr("transform", "translate(0," + height + ")")
+                      .call(xAxis);
+
+                  svg.append("g")
+                      .attr("class", "y axis")
+                      .call(yAxis)
+                    .append("text")
+                      .attr("transform", "rotate(-90)")
+                      .attr("y", 6)
+                      .attr("dy", ".71em")
+                      .style("text-anchor", "end")
+                      .text("Population");
+
+                  var state = svg.selectAll(".state")
+                      .data(data)
+                    .enter().append("g")
+                      .attr("class", "g")
+                      .attr("transform", function(d) { return "translate(" + x0(d.State) + ",0)"; });
+
+                  state.selectAll("rect")
+                      .data(function(d) { return d.ages; })
+                    .enter().append("rect")
+                      .attr("width", x1.rangeBand())
+                      .attr("x", function(d) { return x1(d.name); })
+                      .attr("y", function(d) { return y(d.value); })
+                      .attr("height", function(d) { return height - y(d.value); })
+                      .style("fill", function(d) { return color(d.name); });
+
+                  var legend = svg.selectAll(".legend")
+                      .data(ageNames.slice().reverse())
+                    .enter().append("g")
+                      .attr("class", "legend")
+                      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+                  legend.append("rect")
+                      .attr("x", width - 18)
+                      .attr("width", 18)
+                      .attr("height", 18)
+                      .style("fill", color);
+
+                  legend.append("text")
+                      .attr("x", width - 24)
+                      .attr("y", 9)
+                      .attr("dy", ".35em")
+                      .style("text-anchor", "end")
+                      .text(function(d) { return d; });
+
+                );   
+            }
             
+        
         </script>
         <script type="text/javascript" src="code/js/classie.js"></script>
         <script type="text/javascript" src="code/js/main.js"></script>
     </body>
-</html>
+    </html>

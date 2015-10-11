@@ -60,6 +60,13 @@ app.post('/', function(req, res) {
     this.ReceivedMessageList = [];
 };
 
+var InterestingWords = {
+    FUCK: "fuck",
+    LOVE: "love",
+    HATE: "hate",
+    SHIT: "shit"
+};
+
 SkypeMessageParser.prototype.GetMessageText = function() {
     return this.MessageText;
 };
@@ -654,6 +661,13 @@ Conversation.prototype.GenerateConversationSummary = function() {
     return this.Summary;
 }
 
+Conversation.prototype.GetInterestingWordsPerUser = function() {
+    for(var i = 0; i < this.OrderedMessageList.length; i++) {
+        var trimmed = this.OrderedMessageList[i].GetMessage().trim();
+        //if(trimmed.toLowerCase)
+    }
+}
+
 Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp = [];
     var temp2 = [];
@@ -681,7 +695,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
         temp3.push(temp_most);
         temp4.push(temp_least);
         temp5.push(this.TimestampClusterSummaryList[i]);
-        temp6.push(new Date(this.TimestampClusterList[i].GetStartTimestamp()));
+        temp6.push(new Date(this.TimestampClusterList[i].GetStartTimestamp()).toString());
     }
     for(var i = 0; i < this.MostTalkativeUserList.length; i++) {
         temp7.push(this.MostTalkativeUserList[i].GetUserName());
@@ -693,9 +707,9 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
         temp9.push(this.UserList[i].GetUserName());
     }
     return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
-            "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.OrderedMessageList[0].GetStartTimestamp()).toString(),
-            "end_date": new Date(this.OrderedMessageList[this.OrderedMessageList.length - 1].GetEndTimestamp()).toString(), "total_messages": this.OrderedMessageList.length,
-            "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9};
+            "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.TimestampClusterList[0].GetStartTimestamp()).toString(),
+            "end_date": new Date(this.TimestampClusterList[this.TimestampClusterList.length - 1].GetEndTimestamp()).toString(), "total_messages": this.OrderedMessageList.length,
+            "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9, "trimmed": this.Trimmed};
 };
     
     var finalArray = [];

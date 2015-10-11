@@ -129,13 +129,12 @@ FacebookMessageParser.prototype.ParseMessageText = function() {
         }
         i++;
         var message = arrayOfLines[i];
-        var testday = message.substring(",", timeline.indexOf(":")+3);
+        var testday = message.substring(message.indexOf(",") + 2, message.indexOf(":")+3);
         testday = testday.replace(" at", ",");
         testday = new Date(testday);
-        if (testday.toString() === "Invalid Date"){
+        if (testday.toString() === "Invalid Date" && day.toString() != "Invalid Date"){
             this.ReceivedMessageList.push(new ReceivedMessage(name, day.getTime(), message));
         }
-        i++;
     }
     return this.ReceivedMessageList;
 };
@@ -372,7 +371,7 @@ var Conversation = function(ReceivedMessageList) {
     this.MostTalkativeUserListPerClusterList = [];
     this.LeastTalkativeUserListPerClusterList = [];
     this.TimestampClusterSummaryList = [];
-    this.Summary = [];
+    this.Summary = "";
     this.Trimmed = false;
 };
 
@@ -642,6 +641,19 @@ Conversation.prototype.GenerateTimestampClusterSummaryList = function() {
     return this.TimestampClusterSummaryList;
 };
 
+Conversation.prototype.GenerateConversationSummary = function() {
+    var raw_text = "";
+    for(var i = 0; i < this.OrderedMessageList.length; i++) {
+        raw_text += this.OrderedMessageList[i].GetMessage();
+        if(this.OrderedMessageList[i].GetMessage()[this.OrderedMessageList[i].GetMessage().length - 1] !== '.') {
+            raw_text += '.'
+        }
+        raw_text += ' ';
+    }
+    this.Summary = sum({'corpus': raw_text}).summary;
+    return this.Summary;
+}
+
 Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp = [];
     var temp2 = [];
@@ -649,6 +661,10 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     var temp4 = [];
     var temp5 = [];
     var temp6 = [];
+    var temp7 = [];
+    var temp8 = [];
+    var temp9 = [];
+    var temp10 = [];
     var inner_most = this.MostTalkativeUserListPerClusterList; 
     var inner_least = this.LeastTalkativeUserListPerClusterList;
     for(var i = 0; i < this.GetTimestampClusterList().length; i++) {
@@ -667,14 +683,25 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
         temp5.push(this.TimestampClusterSummaryList[i]);
         temp6.push(new Date(this.TimestampClusterList[i].GetStartTimestamp()));
     }
+    for(var i = 0; i < this.MostTalkativeUserList.length; i++) {
+        temp7.push(this.MostTalkativeUserList[i].GetUserName());
+    }
+    for(var i = 0; i < this.LeastTalkativeUserList.length; i++) {
+        temp8.push(this.LeastTalkativeUserList[i].GetUserName());
+    }
+    for(var i = 0; i < this.UserList.length; i++) {
+        temp9.push(this.UserList[i].GetUserName());
+    }
     return {"buckets": temp, "values": temp2, "most_talkative": temp3, "least_talkative": temp4, "summaries": temp5,
-            "starting_times": temp6};
+            "starting_times": temp6, "conversation_summary": this.Summary, "start_date": new Date(this.OrderedMessageList[0].GetStartTimestamp()).toString(),
+            "end_date": new Date(this.OrderedMessageList[this.OrderedMessageList.length - 1].GetEndTimestamp()).toString(), "total_messages": this.OrderedMessageList.length,
+            "conversation_most_talkative": temp7, "conversation_least_talkative": temp8, "users": temp9};
 };
     
     var finalArray = [];
     var finalString = "";
     
-    var parser = new SkypeMessageParser(content);
+    var parser = new FacebookMessageParser(content);
     parser.ParseMessageText();
     var pc = new Conversation(parser.GetReceivedMessageList());
     pc.PreprocessMessageList();
@@ -683,6 +710,7 @@ Conversation.prototype.DataToFrequencyHistogram = function() {
     uu = pc.FindMostTalkativeUserListPerClusterList();
     uul = pc.FindLeastTalkativeUserListPerClusterList();
     tcsl = pc.GenerateTimestampClusterSummaryList();
+    summ = pc.GenerateConversationSummary();
     hist = pc.DataToFrequencyHistogram();
     /*for(var i = 0; i < pc.GetTimestampClusterList().length; i++) {
         var start = pc.GetTimestampClusterList()[i].GetStartIndex();

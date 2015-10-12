@@ -4,7 +4,7 @@ var path = require('path');
 
 var app = express();
 
-const port = 8080;
+const port = 555;
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname);
@@ -979,8 +979,8 @@ res.render('results', { graphData : hist });
 });
 
 //Incept server
-app.listen(port);
+app.listen(555);
 
 //Confirm run
-console.log("Analysis Server running at http://localhost:%s", port);
+console.log("Analysis Server running at http://localhost:%s", 555);
  
